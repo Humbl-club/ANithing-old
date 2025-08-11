@@ -1,0 +1,230 @@
+name: Daily Data Import
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC (adjust as needed)
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  import-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60 # Timeout after 1 hour
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: npm install @supabase/supabase-js dotenv
+        
+      - name: Run daily import
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          cat > daily-import-runner.js << 'EOF'
+          import { createClient } from '@supabase/supabase-js'
+          
+          const supabase = createClient(
+            process.env.VITE_SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+          )
+          
+          async function runDailyImport() {
+            console.log('🔄 Starting scheduled daily import...')
+            const startTime = Date.now()
+            
+            try {
+              // Import new anime (limited to 2 pages = 100 items)
+              console.log('📥 Importing new anime...')
+              let newAnime = 0
+              
+              for (let page = 1; page <= 2; page++) {
+                const query = `
+                  query ($page: Int) {
+                    Page(page: $page, perPage: 50) {
+                      media(type: ANIME, sort: [UPDATED_AT_DESC]) {
+                        id
+                        title { romaji english native }
+                        description
+                        startDate { year month day }
+                        endDate { year month day }
+                        episodes
+                        duration
+                        season
+                        seasonYear
+                        status
+                        genres
+                        averageScore
+                        popularity
+                        coverImage { large medium }
+                        studios { nodes { name } }
+                        isAdult
+                        updatedAt
+                      }
+                    }
+                  }
+                `
+                
+                const response = await fetch('https://graphql.anilist.co', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ query, variables: { page } })
+                })
+                
+                const result = await response.json()
+                const media = result.data?.Page?.media || []
+                
+                for (const anime of media) {
+                  if (anime.isAdult || (anime.averageScore && anime.averageScore < 60)) continue
+                  
+                  // Check if exists
+                  const { data: existing } = await supabase
+                    .from('titles')
+                    .select('id')
+                    .eq('anilist_id', anime.id)
+                    .single()
+                  
+                  if (existing) continue // Skip existing
+                  
+                  // Insert new anime
+                  const titleData = {
+                    anilist_id: anime.id,
+                    title: anime.title?.romaji || 'Unknown',
+                    title_english: anime.title?.english,
+                    description: anime.description,
+                    content_type: 'anime',
+                    score: anime.averageScore ? anime.averageScore / 10 : null,
+                    popularity: anime.popularity || 0,
+                    image_url: anime.coverImage?.large || anime.coverImage?.medium,
+                    status: anime.status || 'UNKNOWN',
+                    aired_from: anime.startDate ? 
+                      `${anime.startDate.year || 1900}-${String(anime.startDate.month || 1).padStart(2, '0')}-${String(anime.startDate.day || 1).padStart(2, '0')}` : null
+                  }
+                  
+                  const { data: newTitle } = await supabase
+                    .from('titles')
+                    .insert(titleData)
+                    .select('id')
+                    .single()
+                  
+                  if (newTitle) {
+                    // Add anime details
+                    await supabase.from('anime_details').insert({
+                      title_id: newTitle.id,
+                      episodes: anime.episodes,
+                      duration: anime.duration,
+                      season: anime.season,
+                      season_year: anime.seasonYear
+                    })
+                    
+                    newAnime++
+                  }
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 1000)) // Rate limit
+              }
+              
+              // Import new manga (limited to 1 page = 50 items)
+              console.log('📚 Importing new manga...')
+              let newManga = 0
+              
+              const mangaQuery = `
+                query {
+                  Page(page: 1, perPage: 50) {
+                    media(type: MANGA, sort: [UPDATED_AT_DESC]) {
+                      id
+                      title { romaji english native }
+                      description
+                      startDate { year month day }
+                      chapters
+                      volumes
+                      status
+                      genres
+                      averageScore
+                      popularity
+                      coverImage { large medium }
+                      isAdult
+                    }
+                  }
+                }
+              `
+              
+              const mangaResponse = await fetch('https://graphql.anilist.co', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: mangaQuery })
+              })
+              
+              const mangaResult = await mangaResponse.json()
+              const mangaMedia = mangaResult.data?.Page?.media || []
+              
+              for (const manga of mangaMedia) {
+                if (manga.isAdult || (manga.averageScore && manga.averageScore < 60)) continue
+                
+                const { data: existing } = await supabase
+                  .from('titles')
+                  .select('id')
+                  .eq('anilist_id', manga.id)
+                  .single()
+                
+                if (existing) continue
+                
+                const titleData = {
+                  anilist_id: manga.id,
+                  title: manga.title?.romaji || 'Unknown',
+                  title_english: manga.title?.english,
+                  description: manga.description,
+                  content_type: 'manga',
+                  score: manga.averageScore ? manga.averageScore / 10 : null,
+                  popularity: manga.popularity || 0,
+                  image_url: manga.coverImage?.large || manga.coverImage?.medium,
+                  status: manga.status || 'UNKNOWN'
+                }
+                
+                const { data: newTitle } = await supabase
+                  .from('titles')
+                  .insert(titleData)
+                  .select('id')
+                  .single()
+                
+                if (newTitle) {
+                  await supabase.from('manga_details').insert({
+                    title_id: newTitle.id,
+                    chapters: manga.chapters,
+                    volumes: manga.volumes
+                  })
+                  
+                  newManga++
+                }
+              }
+              
+              const duration = ((Date.now() - startTime) / 1000).toFixed(1)
+              console.log(`✅ Daily import completed in ${duration}s`)
+              console.log(`📊 Results: ${newAnime} new anime, ${newManga} new manga`)
+              
+              // Log success
+              process.exit(0)
+              
+            } catch (error) {
+              console.error('❌ Daily import failed:', error.message)
+              process.exit(1)
+            }
+          }
+          
+          runDailyImport()
+          EOF
+          
+          node daily-import-runner.js
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Daily import job failed"
+          echo "Check the logs above for details"

@@ -1,0 +1,81 @@
+project_id = "axtpbgsjbmhbuqomarcr"
+
+[api]
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+
+[studio]
+port = 54323
+
+[storage]
+file_size_limit = "50MiB"
+
+[auth]
+site_url = "https://7fc28aed-a663-4753-8877-1ca39b8ccf8c.lovableproject.com"
+additional_redirect_urls = ["https://7fc28aed-a663-4753-8877-1ca39b8ccf8c.lovableproject.com"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+
+[functions.anime-api-new]
+verify_jwt = false
+
+[functions.cached-content-v2]
+verify_jwt = false
+
+[functions.cache-get]
+verify_jwt = false
+
+[functions.cache-set]
+verify_jwt = false
+
+[functions.cache-utils]
+verify_jwt = false
+
+[functions.check-streaming-availability]
+verify_jwt = false
+
+[functions.temp-anilist-populate-enhanced]
+verify_jwt = false
+
+[functions.kitsu-sync-engine-enhanced]
+verify_jwt = false
+
+[functions.anilist-enhanced-population]
+verify_jwt = false
+
+# Newly added functions
+[functions.import-data-enhanced]
+verify_jwt = false
+
+[functions.scheduled-import]
+verify_jwt = false
+
+[functions.health]
+verify_jwt = false
+
+[functions.get-home-data]
+verify_jwt = false
+
+[functions.get-content-details]
+verify_jwt = false
+
+[functions.import-anime]
+verify_jwt = false
+
+[functions.import-manga]
+verify_jwt = false
+
+[functions.import-data]
+verify_jwt = false
+
+[functions.daily-import]
+verify_jwt = false

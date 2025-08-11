@@ -1,0 +1,17 @@
+-- TEMP: disable RLS on core content tables for local debugging
+-- NOTE: revert before production
+
+ALTER TABLE IF EXISTS public.titles DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.anime_details DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.manga_details DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.genres DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.title_genres DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.studios DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.title_studios DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.authors DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.title_authors DISABLE ROW LEVEL SECURITY;
+
+-- Also disable on any legacy or aux tables used by queries
+ALTER TABLE IF EXISTS public.reviews DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.user_anime_lists DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.user_manga_lists DISABLE ROW LEVEL SECURITY;

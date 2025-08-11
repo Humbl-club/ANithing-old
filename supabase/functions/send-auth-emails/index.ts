@@ -1,0 +1,219 @@
+
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
+import { Resend } from 'https://esm.sh/resend@4.0.0'
+
+// Use environment variables instead of hardcoded values
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+const resendApiKey = Deno.env.get('RESEND_API_KEY')!
+const appUrl = Deno.env.get('APP_URL') || 'https://yourdomain.com'
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
+const resend = new Resend(resendApiKey)
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+Deno.serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders })
+  }
+  
+  const correlationId = crypto.randomUUID()
+  console.log(`[${correlationId}] Auth email function triggered`)
+  console.log(`[${correlationId}] Request method: ${req.method}`)
+  console.log(`[${correlationId}] Request headers:`, Object.fromEntries(req.headers.entries()))
+  
+  try {
+    // Parse request body
+    const body = await req.text()
+    console.log(`[${correlationId}] Raw request body:`, body)
+    
+    let payload: any
+    try {
+      payload = JSON.parse(body)
+    } catch (parseError) {
+      console.error(`[${correlationId}] JSON parse error:`, parseError)
+      throw new Error('Invalid JSON in request body')
+    }
+    
+    console.log(`[${correlationId}] Parsed payload:`, JSON.stringify(payload, null, 2))
+    
+    // Extract email data from different payload formats
+    let emailData: any = {}
+    
+    if (payload.record || payload.old_record) {
+      // Webhook format from database trigger
+      const record = payload.record || payload.old_record
+      emailData = {
+        email: record.email,
+        user_id: record.id,
+        email_action_type: 'signup'
+      }
+    } else {
+      // Direct API call format
+      emailData = {
+        email: payload.email,
+        user_id: payload.user_id,
+        email_action_type: payload.email_action_type || 'signup'
+      }
+    }
+    
+    console.log(`[${correlationId}] Extracted emailData:`, JSON.stringify(emailData, null, 2))
+    
+    // Validate required fields
+    if (!emailData.email || !emailData.user_id) {
+      throw new Error(`Missing required fields: email=${emailData.email}, user_id=${emailData.user_id}`)
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(emailData.email)) {
+      throw new Error('Invalid email format')
+    }
+    
+    console.log(`[${correlationId}] Sending email to:`, emailData.email)
+    
+    // Check if RESEND_API_KEY is set
+    if (!Deno.env.get('RESEND_API_KEY')) {
+      throw new Error('RESEND_API_KEY is not configured')
+    }
+    
+    // Generate email content using environment variables
+    const confirmationUrl = appUrl
+    
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Welcome to Anithing - Confirm Your Email</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .logo { color: #8b5cf6; font-size: 24px; font-weight: bold; }
+            .content { background: #f9fafb; padding: 30px; border-radius: 8px; }
+            .button { display: inline-block; background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="logo">🎌 Anithing</div>
+            </div>
+            <div class="content">
+              <h2>Welcome to Anithing!</h2>
+              <p>Thank you for signing up! We're excited to have you join our anime and manga tracking community.</p>
+              <p>To get started, please confirm your email address by clicking the button below:</p>
+              <div style="text-align: center;">
+                <a href="${confirmationUrl}" class="button">Confirm Your Email</a>
+              </div>
+              <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
+              <p style="word-break: break-all; color: #8b5cf6;">${confirmationUrl}</p>
+              <p>Once confirmed, you'll be able to:</p>
+              <ul>
+                <li>Track your favorite anime and manga</li>
+                <li>Get personalized recommendations</li>
+                <li>Connect with other fans</li>
+                <li>Discover new series to watch and read</li>
+              </ul>
+            </div>
+            <div class="footer">
+              <p>If you didn't create an account with us, you can safely ignore this email.</p>
+              <p>Happy watching and reading!</p>
+              <p>The Anithing Team</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `
+    
+    console.log(`[${correlationId}] About to send email with Resend...`)
+    
+    // Send email using Resend
+    const { data: emailResult, error: emailError } = await resend.emails.send({
+      from: 'Anithing <noreply@anithing.space>',
+      to: [emailData.email],
+      subject: '🎌 Welcome to Anithing - Confirm Your Email',
+      html: htmlContent,
+    })
+    
+    if (emailError) {
+      console.error(`[${correlationId}] Email send error:`, emailError)
+      throw new Error(`Failed to send email: ${emailError.message}`)
+    }
+    
+    console.log(`[${correlationId}] Email sent successfully:`, emailResult?.id)
+    
+    // Log success to database
+    await supabase
+      .from('cron_job_logs')
+      .insert({
+        job_name: 'send_auth_email',
+        status: 'success',
+        details: {
+          correlation_id: correlationId,
+          email_id: emailResult?.id,
+          user_id: emailData.user_id,
+          email: emailData.email
+        }
+      })
+    
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        message: 'Email sent successfully',
+        correlation_id: correlationId,
+        email_id: emailResult?.id
+      }),
+      {
+        status: 200,
+        headers: { 
+          'Content-Type': 'application/json',
+          ...corsHeaders 
+        },
+      }
+    )
+    
+  } catch (error) {
+    console.error(`[${correlationId}] Error in send-auth-emails function:`, error)
+    
+    // Log error to database
+    try {
+      await supabase
+        .from('cron_job_logs')
+        .insert({
+          job_name: 'send_auth_email',
+          status: 'failed',
+          error_message: error?.message || 'Unknown error',
+          details: {
+            correlation_id: correlationId,
+            error: error?.toString()
+          }
+        })
+    } catch (logError) {
+      console.error(`[${correlationId}] Failed to log error:`, logError)
+    }
+    
+    return new Response(
+      JSON.stringify({
+        error: {
+          message: error?.message || 'Internal server error',
+          correlation_id: correlationId
+        },
+      }),
+      {
+        status: 500,
+        headers: { 
+          'Content-Type': 'application/json',
+          ...corsHeaders 
+        },
+      }
+    )
+  }
+})
