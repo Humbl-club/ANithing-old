@@ -1,37 +1,39 @@
-const BadWordsFilter = {
-  isProfane: (text: string) => false,
-  clean: (text: string) => text
-};
-
-const filter = new BadWordsFilter();
-
-const inappropriateWords: string[] = [];
-
-export function moderateContent(content: string): {
-  isAppropriate: boolean;
-  cleanedContent: string;
-  flaggedWords: string[];
-} {
-  const lowercaseContent = content.toLowerCase();
-  const flaggedWords: string[] = [];
+export class ModerationService {
+  private filter: any;
   
-  inappropriateWords.forEach(word => {
-    if (lowercaseContent.includes(word.toLowerCase())) {
-      flaggedWords.push(word);
+  constructor() {
+    // Initialize without external dependency for now
+    this.filter = {
+      isProfane: (text: string) => false,
+      clean: (text: string) => text
+    };
+  }
+
+  filterContent(content: any): any {
+    if (typeof content === 'string') {
+      return this.filter.clean(content);
     }
-  });
-  
-  const isProfane = filter.isProfane(content);
-  const cleanedContent = filter.clean(content);
-  
-  return {
-    isAppropriate: !isProfane && flaggedWords.length === 0,
-    cleanedContent,
-    flaggedWords
-  };
+    
+    if (Array.isArray(content)) {
+      return content.map(item => this.filterContent(item));
+    }
+    
+    if (typeof content === 'object' && content !== null) {
+      const filtered: any = {};
+      for (const [key, value] of Object.entries(content)) {
+        filtered[key] = this.filterContent(value);
+      }
+      return filtered;
+    }
+    
+    return content;
+  }
+
+  checkContent(text: string): { isClean: boolean; filteredText: string } {
+    const isClean = !this.filter.isProfane(text);
+    const filteredText = this.filter.clean(text);
+    return { isClean, filteredText };
+  }
 }
 
-export function validateUsername(username: string): boolean {
-  const result = moderateContent(username);
-  return result.isAppropriate && username.length >= 3 && username.length <= 20;
-}
+export const moderationService = new ModerationService();

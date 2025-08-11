@@ -6,3 +6,7 @@ export function validateEmail(email: string) {
     suggestions: []
   };
 }
+
+export function checkEmailExists(email: string) {
+  return Promise.resolve({ exists: false });
+}

@@ -20,6 +20,18 @@ export const authService = {
     };
   },
   
+  signOut: async () => {
+    const { error } = await supabase.auth.signOut();
+    return { success: !error, error };
+  },
+  
+  signInWithGoogle: async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google'
+    });
+    return { data, error };
+  },
+  
   resendConfirmation: async (email: string) => {
     const result = await supabase.auth.resend({ type: 'signup', email });
     return {

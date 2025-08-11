@@ -1,263 +1,113 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { set, get } from 'idb-keyval';
-import { supabase } from '@/integrations/supabase/client';
-export interface AppearanceSettings {
+import { supabase } from '@/lib/supabaseClient';
+
+interface Settings {
   theme: 'light' | 'dark' | 'system';
-  primaryColor: string;
-  accentColor: string;
-  glassmorphism: boolean;
-  animations: boolean;
-  compactMode: boolean;
-  fontSize: 'small' | 'medium' | 'large';
+  language: string;
+  autoplay: boolean;
+  notifications: boolean;
+  mature_content: boolean;
+  data_saver: boolean;
+  offline_mode: boolean;
+  sync_on_startup: boolean;
 }
-export interface BehaviorSettings {
-  autoSync: boolean;
-  autoAddSequels: boolean;
-  showAdultContent: boolean;
-  defaultListStatus: string;
-  notificationsEnabled: boolean;
-  soundEffects: boolean;
-  defaultView: 'grid' | 'list';
-  itemsPerPage: number;
-}
-export interface PrivacySettings {
-  listVisibility: 'public' | 'private' | 'friends';
-  showProgress: boolean;
-  showRatings: boolean;
-  activityVisible: boolean;
-  profileVisible: boolean;
-}
-export interface AdvancedSettings {
-  debugMode: boolean;
-  experimentalFeatures: boolean;
-  cacheSize: number;
-  syncInterval: number;
-  virtualScrolling: boolean;
-  preloadImages: boolean;
-}
-export interface UserSettings {
-  appearance: AppearanceSettings;
-  behavior: BehaviorSettings;
-  privacy: PrivacySettings;
-  advanced: AdvancedSettings;
-}
-const defaultSettings: UserSettings = {
-  appearance: {
-    theme: 'system',
-    primaryColor: '#3B82F6',
-    accentColor: '#EF4444',
-    glassmorphism: true,
-    animations: true,
-    compactMode: false,
-    fontSize: 'medium',
-  },
-  behavior: {
-    autoSync: true,
-    autoAddSequels: true,
-    showAdultContent: false,
-    defaultListStatus: 'plan_to_watch',
-    notificationsEnabled: true,
-    soundEffects: true,
-    defaultView: 'grid',
-    itemsPerPage: 20,
-  },
-  privacy: {
-    listVisibility: 'public',
-    showProgress: true,
-    showRatings: true,
-    activityVisible: true,
-    profileVisible: true,
-  },
-  advanced: {
-    debugMode: false,
-    experimentalFeatures: false,
-    cacheSize: 100,
-    syncInterval: 30,
-    virtualScrolling: false,
-    preloadImages: true,
-  },
-};
-interface SettingsStore {
-  settings: UserSettings;
-  isLoading: boolean;
-  hasChanges: boolean;
-  // Actions
-  updateAppearance: (updates: Partial<AppearanceSettings>) => void;
-  updateBehavior: (updates: Partial<BehaviorSettings>) => void;
-  updatePrivacy: (updates: Partial<PrivacySettings>) => void;
-  updateAdvanced: (updates: Partial<AdvancedSettings>) => void;
+
+interface SettingsState {
+  settings: Settings;
+  loading: boolean;
+  error: string | null;
+  updateSettings: (updates: Partial<Settings>) => Promise<void>;
+  loadSettings: () => Promise<void>;
   resetSettings: () => void;
-  resetCategory: (category: keyof UserSettings) => void;
-  exportSettings: () => string;
-  importSettings: (settingsJson: string) => boolean;
-  saveToSupabase: () => Promise<void>;
-  loadFromSupabase: () => Promise<void>;
-  markSaved: () => void;
 }
-export const useSettingsStore = create<SettingsStore>()(
+
+const defaultSettings: Settings = {
+  theme: 'system',
+  language: 'en',
+  autoplay: true,
+  notifications: true,
+  mature_content: false,
+  data_saver: false,
+  offline_mode: false,
+  sync_on_startup: true
+};
+
+export const useSettingsStore = create<SettingsState>()(
   persist(
     (set, get) => ({
       settings: defaultSettings,
-      isLoading: false,
-      hasChanges: false,
-      updateAppearance: (updates) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            appearance: { ...state.settings.appearance, ...updates },
-          },
-          hasChanges: true,
-        })),
-      updateBehavior: (updates) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            behavior: { ...state.settings.behavior, ...updates },
-          },
-          hasChanges: true,
-        })),
-      updatePrivacy: (updates) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            privacy: { ...state.settings.privacy, ...updates },
-          },
-          hasChanges: true,
-        })),
-      updateAdvanced: (updates) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            advanced: { ...state.settings.advanced, ...updates },
-          },
-          hasChanges: true,
-        })),
-      resetSettings: () =>
-        set({
-          settings: defaultSettings,
-          hasChanges: true,
-        }),
-      resetCategory: (category) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            [category]: defaultSettings[category],
-          },
-          hasChanges: true,
-        })),
-      exportSettings: () => {
-        const { settings } = get();
-        return JSON.stringify(settings, null, 2);
-      },
-      importSettings: (settingsJson) => {
+      loading: false,
+      error: null,
+
+      updateSettings: async (updates: Partial<Settings>) => {
         try {
-          const imported = JSON.parse(settingsJson);
-          set({
-            settings: { ...defaultSettings, ...imported },
-            hasChanges: true,
-          });
-          return true;
-        } catch {
-          return false;
-        }
-      },
-      saveToSupabase: async () => {
-        // Save user settings to Supabase
-        const { settings } = get();
-        try {
-          set({ isLoading: true });
+          set({ loading: true, error: null });
           
-          // Get current user
+          const newSettings = { ...get().settings, ...updates };
+          set({ settings: newSettings });
+
+          // Save to database if user is authenticated
           const { data: { user } } = await supabase.auth.getUser();
-          if (!user) {
-            console.warn('Cannot save settings: User not authenticated');
-            return;
+          if (user) {
+            // Store settings as JSON in notification_settings column temporarily
+            const { error } = await supabase
+              .from('user_preferences')
+              .upsert({
+                user_id: user.id,
+                notification_settings: newSettings,
+                show_adult_content: newSettings.mature_content,
+                updated_at: new Date().toISOString()
+              });
+
+            if (error && error.code !== 'PGRST116') throw error;
           }
-
-          // Upsert user preferences
-          const { error } = await supabase
-            .from('user_preferences')
-            .upsert({
-              user_id: user.id,
-              preferences: settings,
-              updated_at: new Date().toISOString()
-            }, {
-              onConflict: 'user_id'
-            });
-
-          if (error) {
-            console.error('Failed to save settings to Supabase:', error);
-            throw error;
-          }
-
-          set({ hasChanges: false });
         } catch (error) {
-          console.error('Error saving settings:', error);
-          throw error;
+          console.error('Failed to update settings:', error);
+          set({ error: 'Failed to update settings' });
         } finally {
-          set({ isLoading: false });
+          set({ loading: false });
         }
       },
-      loadFromSupabase: async () => {
-        // Load user settings from Supabase
-        try {
-          set({ isLoading: true });
-          
-          // Get current user
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) {
-            console.warn('Cannot load settings: User not authenticated');
-            return;
-          }
 
-          // Fetch user preferences
+      loadSettings: async () => {
+        try {
+          set({ loading: true, error: null });
+          
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+
           const { data, error } = await supabase
             .from('user_preferences')
-            .select('preferences')
+            .select('*')
             .eq('user_id', user.id)
             .single();
 
-          if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
-            console.error('Failed to load settings from Supabase:', error);
-            throw error;
-          }
+          if (error && error.code !== 'PGRST116') throw error;
 
-          // Merge loaded preferences with defaults
-          if (data?.preferences) {
-            const loadedSettings = data.preferences;
-            set((state) => ({
-              settings: {
-                ...state.settings,
-                ...loadedSettings
-              },
-              hasChanges: false
-            }));
+          if (data && data.notification_settings) {
+            // Load settings from notification_settings JSON
+            const loadedSettings = {
+              ...defaultSettings,
+              ...(typeof data.notification_settings === 'object' ? data.notification_settings : {}),
+              mature_content: data.show_adult_content ?? defaultSettings.mature_content
+            };
+            set({ settings: loadedSettings });
           }
         } catch (error) {
-          console.error('Error loading settings:', error);
-          throw error;
+          console.error('Failed to load settings:', error);
+          set({ error: 'Failed to load settings' });
         } finally {
-          set({ isLoading: false });
+          set({ loading: false });
         }
       },
-      markSaved: () => set({ hasChanges: false }),
+
+      resetSettings: () => {
+        set({ settings: defaultSettings });
+      }
     }),
     {
-      name: 'anithing-settings',
-      storage: {
-        getItem: async (name) => {
-          const value = await get(name);
-          return value || null;
-        },
-        setItem: async (name, value) => {
-          await set(name, value);
-        },
-        removeItem: async (name) => {
-          // idb-keyval doesn't have a direct remove, but we can set to undefined
-          await set(name, undefined);
-        },
-      },
+      name: 'settings-storage'
     }
   )
 );
