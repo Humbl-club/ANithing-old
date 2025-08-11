@@ -113,6 +113,7 @@ export function useIntersectionObserver(
 export function logMemoryUsage(label: string) {
   if ('memory' in performance) {
     const memory = (performance as any).memory;
+    console.log(`Memory Usage (${label}):`, {
       used: Math.round(memory.usedJSHeapSize / 1024 / 1024) + ' MB',
       total: Math.round(memory.totalJSHeapSize / 1024 / 1024) + ' MB',
       limit: Math.round(memory.jsHeapSizeLimit / 1024 / 1024) + ' MB'

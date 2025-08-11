@@ -58,7 +58,8 @@
       "Bash(npx tsc:*)",
       "Bash(./optimize-final.sh:*)",
       "Bash(npx vite build:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(npm view:*)"
     ],
     "deny": []
   }

@@ -22,7 +22,7 @@ export class RoutePreloader {
     '/': {
       preloadTargets: [
         {
-          importFn: () => import('../pages/Anime'),
+          importFn: () => import('../pages/ContentBrowse'),
           key: 'anime-page',
           delay: 1000,
           priority: 'high'
@@ -66,7 +66,7 @@ export class RoutePreloader {
     '/anime': {
       preloadTargets: [
         {
-          importFn: () => import('../pages/Manga'),
+          importFn: () => import('../pages/ContentBrowse'),
           key: 'manga-page',
           delay: 1000,
           priority: 'high'
@@ -88,7 +88,7 @@ export class RoutePreloader {
     '/manga': {
       preloadTargets: [
         {
-          importFn: () => import('../pages/Anime'),
+          importFn: () => import('../pages/ContentBrowse'),
           key: 'anime-page',
           delay: 1000,
           priority: 'high'
@@ -104,13 +104,13 @@ export class RoutePreloader {
     '/trending': {
       preloadTargets: [
         {
-          importFn: () => import('../pages/Anime'),
+          importFn: () => import('../pages/ContentBrowse'),
           key: 'anime-page',
           delay: 1000,
           priority: 'high'
         },
         {
-          importFn: () => import('../pages/Manga'),
+          importFn: () => import('../pages/ContentBrowse'),
           key: 'manga-page',
           delay: 1500,
           priority: 'high'
@@ -209,9 +209,9 @@ export class RoutePreloader {
 */
   static preloadFeatures(features: string[]): void {
     const featureMap: Record<string, () => Promise<any>> = {
-      'social-features': () => import('../features/social/components/SocialFeaturesRefactored'),
-      'advanced-filtering': () => import('../features/filtering/components/AdvancedFilteringRefactored'),
-      'list-manager': () => import('../features/lists/components/ListManagerRefactored'),
+      'social-features': () => import('../features/social/components/SocialFeatures'),
+      'advanced-filtering': () => import('../features/filtering/components/AdvancedFiltering'),
+      'list-manager': () => import('../features/lists/components/ListManager'),
       'home-components': () => import('../features/home/components'),
       'auth-components': () => import('../features/auth/components/AuthForm')
     };

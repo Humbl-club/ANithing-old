@@ -1,4 +1,4 @@
-import { ListManagerRefactored } from '@/features/lists/components/ListManagerRefactored';
+import { ListManagerRefactored } from '@/features/lists/components/ListManager';
 import { type ListStatus } from '@/types/userLists';
 
 interface ListManagerProps {

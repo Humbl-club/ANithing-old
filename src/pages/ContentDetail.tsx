@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Star, Heart, Plus, Share2 } from 'lucide-react';
-import { AddToListButton } from '@/components/features/AddToListButton';
+import { AddToListButton } from '@/shared/components/AddToListButton';
 import { ContentList } from '@/components/generic/ContentList';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
