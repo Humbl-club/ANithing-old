@@ -17,7 +17,7 @@ async function runDailyImport() {
   const startTime = Date.now()
   let newAnime = 0
   let newManga = 0
-  let errors = []
+  const errors = []
 
   try {
     // Import recent high-quality anime (2 pages = 100 items max)

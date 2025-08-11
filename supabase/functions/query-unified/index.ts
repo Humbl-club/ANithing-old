@@ -179,7 +179,7 @@ async function getContentDetails(supabase: any, params: URLSearchParams) {
   }
 
   // Build query based on content type
-  let query = supabase
+  const query = supabase
     .from('titles')
     .select(`
       *,

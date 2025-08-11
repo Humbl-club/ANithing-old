@@ -192,17 +192,17 @@ const App = () => {
   const { isInitialized } = useInitializationStore();
   
   // Safety check for React
-  if (!React || !React.useEffect) {
-    // React not properly loaded - handle error silently
-    return <div>Loading...</div>;
-  }
-  
   // Memoize providers structure to prevent recreation
   const appContent = useMemo(() => (
     <BrowserRouter>
       <AppContent />
     </BrowserRouter>
   ), []);
+
+  if (!React || !React.useEffect) {
+    // React not properly loaded - handle error silently
+    return <div>Loading...</div>;
+  }
   
   return (
     <HelmetProvider>

@@ -119,7 +119,7 @@ export class BundleAnalyzer {
   }
 
   private static calculatePerformanceScore(chunks: ChunkInfo[]): number {
-    let score = 100;
+    const score = 100;
     let penalties = 0;
 
     chunks.forEach(chunk => {

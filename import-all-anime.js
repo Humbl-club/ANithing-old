@@ -14,7 +14,7 @@ const supabase = createClient(
 let totalImported = 0
 let totalSkipped = 0
 let totalErrors = 0
-let startTime = Date.now()
+const startTime = Date.now()
 
 // Save progress to file
 function saveProgress(page, totalPages) {
