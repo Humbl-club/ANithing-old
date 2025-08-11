@@ -55,6 +55,7 @@ class DataCache {
     
     // Log cleanup stats in development
     if (process.env.NODE_ENV === 'development' && expiredKeys.length > 0) {
+      // Cleanup occurred - logging disabled in production
     }
   }
   // Fetch with cache

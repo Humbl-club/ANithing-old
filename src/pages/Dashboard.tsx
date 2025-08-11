@@ -29,9 +29,6 @@ const Dashboard = React.memo(() => {
     </div>
   ), []);
 
-  if (loading) {
-    return loadingComponent;
-  }
   // Memoize tier color calculation
   const getTierColor = useCallback((tier?: string) => {
     switch (tier) {
@@ -54,6 +51,10 @@ const Dashboard = React.memo(() => {
       default: return '🌟';
     }
   }, []);
+
+  if (loading) {
+    return loadingComponent;
+  }
   return (
     <div className="min-h-screen">
       <Navigation />

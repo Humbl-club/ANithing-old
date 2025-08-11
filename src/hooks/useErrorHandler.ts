@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { errorService, ErrorSeverity, ErrorContext } from '@/services/errorService';
 
@@ -133,7 +133,7 @@ export function useErrorHandler(
 export function withErrorBoundary<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   componentName: string
-) {
+): React.FC<P> {
   return function ErrorWrappedComponent(props: P) {
     const { handleError } = useErrorHandler(componentName);
 
@@ -157,6 +157,6 @@ export function withErrorBoundary<P extends object>(
       return acc;
     }, {} as any);
 
-    return <WrappedComponent {...wrappedProps} />;
+    return React.createElement(WrappedComponent, wrappedProps);
   };
 }

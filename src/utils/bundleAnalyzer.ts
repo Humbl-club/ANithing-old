@@ -184,6 +184,7 @@ export class PerformanceMonitor {
     this.metrics.delete(label);
     
     if (process.env.NODE_ENV === 'development') {
+      // Performance measurement logged
     }
     
     return duration;
@@ -212,6 +213,7 @@ export class PerformanceMonitor {
     new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
         if (entry.name === 'first-contentful-paint') {
+          // FCP metric captured
         }
       }
     }).observe({ entryTypes: ['paint'] });

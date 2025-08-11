@@ -334,30 +334,25 @@ const GET_MEDIA_DETAILS_QUERY = `
 `;
 class AniListService {
   private async makeRequest(query: string, variables?: any): Promise<any> {
-    try {
-      const response = await fetch(ANILIST_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          query,
-          variables,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`AniList API error: ${response.status}`);
-      }
-      const data = await response.json();
-      if (data.errors) {
-        throw new Error(`AniList GraphQL error: ${data.errors[0]?.message}`);
-      }
-      return data;
-    } catch (error) {
-      // Error logged silently
-      throw error;
+    const response = await fetch(ANILIST_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        query,
+        variables,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error(`AniList API error: ${response.status}`);
     }
+    const data = await response.json();
+    if (data.errors) {
+      throw new Error(`AniList GraphQL error: ${data.errors[0]?.message}`);
+    }
+    return data;
   }
   // Enhanced search supporting both anime and manga
   async searchMedia(options: {

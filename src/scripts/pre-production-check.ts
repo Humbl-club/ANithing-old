@@ -23,6 +23,7 @@ async function runProductionChecks(): Promise<ProductionChecks> {
     const { error } = await supabase.from('titles').select('count').limit(1);
     checks.database = !error;
   } catch (e) {
+    // Database check failed
   }
   // 2. Edge functions
   try {
@@ -37,16 +38,19 @@ async function runProductionChecks(): Promise<ProductionChecks> {
           functionsWorking++;
         }
       } catch (e) {
+        // Edge function test failed
       }
     }
     checks.edgeFunctions = functionsWorking >= Math.ceil(functions.length * 0.66); // Majority should work
   } catch (e) {
+    // Edge functions check failed
   }
   // 3. Authentication
   try {
     const { data: { session } } = await supabase.auth.getSession();
     checks.authentication = true; // System is available even if no session
   } catch (e) {
+    // Authentication check failed
   }
   // 4. Data population
   try {
@@ -60,6 +64,7 @@ async function runProductionChecks(): Promise<ProductionChecks> {
     const titlesCount = titlesResult.count || 0;
     checks.dataPopulation = animeCount > 0 && mangaCount > 0 && titlesCount > 0;
   } catch (e) {
+    // Data population check failed
   }
   // 5. Performance
   const startTime = performance.now();
@@ -72,6 +77,7 @@ async function runProductionChecks(): Promise<ProductionChecks> {
     const duration = performance.now() - startTime;
     checks.performance = duration < 2000; // Should complete in under 2 seconds
   } catch (e) {
+    // Performance check failed
   }
   // 6. Materialized Views
   try {
@@ -79,6 +85,7 @@ async function runProductionChecks(): Promise<ProductionChecks> {
       .rpc('get_trending_anime', { limit_param: 1 });
     checks.materializedViews = !mvError && Array.isArray(mvData);
   } catch (e) {
+    // Materialized views check failed
   }
   // 7. Database Indexes (check query performance)
   try {
@@ -91,6 +98,7 @@ async function runProductionChecks(): Promise<ProductionChecks> {
     const indexDuration = performance.now() - indexStartTime;
     checks.indexes = indexDuration < 500; // Should be very fast with indexes
   } catch (e) {
+    // Indexes check failed
   }
   // Summary
   const passedChecks = Object.values(checks).filter(check => check).length;
@@ -100,6 +108,7 @@ async function runProductionChecks(): Promise<ProductionChecks> {
   if (!allPassed) {
     Object.entries(checks).forEach(([check, passed]) => {
       if (!passed) {
+        // Check failed
       }
     });
   }
