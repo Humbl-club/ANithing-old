@@ -59,7 +59,10 @@
       "Bash(./optimize-final.sh:*)",
       "Bash(npx vite build:*)",
       "Bash(npm uninstall:*)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(npm run lint)",
+      "Bash(git add:*)",
+      "Bash(./fix-typescript-errors.sh)"
     ],
     "deny": []
   }

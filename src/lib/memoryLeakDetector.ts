@@ -172,27 +172,27 @@ export class MemoryLeakDetector {
     const originalSetInterval = window.setInterval;
     const originalClearInterval = window.clearInterval;
 
-    window.setTimeout = (...args: any[]) => {
+    window.setTimeout = ((...args: any[]) => {
       const id = originalSetTimeout.apply(window, args);
       this.timers.add(id);
       return id;
-    };
+    }) as any;
 
-    window.clearTimeout = (id: number) => {
+    window.clearTimeout = ((id: number) => {
       this.timers.delete(id);
       return originalClearTimeout(id);
-    };
+    }) as any;
 
-    window.setInterval = (...args: any[]) => {
+    window.setInterval = ((...args: any[]) => {
       const id = originalSetInterval.apply(window, args);
       this.timers.add(id);
       return id;
-    };
+    }) as any;
 
-    window.clearInterval = (id: number) => {
+    window.clearInterval = ((id: number) => {
       this.timers.delete(id);
       return originalClearInterval(id);
-    };
+    }) as any;
   }
 
   /**

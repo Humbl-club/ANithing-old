@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { set, get } from 'idb-keyval';
+import { supabase } from '@/integrations/supabase/client';
 export interface AppearanceSettings {
   theme: 'light' | 'dark' | 'system';
   primaryColor: string;

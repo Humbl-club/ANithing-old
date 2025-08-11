@@ -62,7 +62,7 @@ export const ContentCard = memo(<T extends BaseContent>({
       {/* Image */}
       <div className="relative h-full overflow-hidden">
         <LazyImage
-          src={imageUrl}
+          src={imageUrl || ''}
           alt={displayName}
           className="w-full h-full"
           placeholderClassName="bg-gradient-to-br from-primary/20 to-accent/20"
@@ -114,8 +114,8 @@ export const ContentCard = memo(<T extends BaseContent>({
         
         {/* Add to List Button */}
         <AddToListButton
-          contentId={String(content.id)}
-          contentType={content.content_type}
+          item={content as any}
+          type={content.content_type}
         />
       </div>
     </Card>
