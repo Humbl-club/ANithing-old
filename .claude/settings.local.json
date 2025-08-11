@@ -63,7 +63,10 @@
       "Bash(npm run lint)",
       "Bash(git add:*)",
       "Bash(./fix-typescript-errors.sh)",
-      "Bash(./comprehensive-fix.sh)"
+      "Bash(./comprehensive-fix.sh)",
+      "Bash(git push:*)",
+      "Bash(./cleanup.sh)",
+      "Bash(npm audit:*)"
     ],
     "deny": []
   }
