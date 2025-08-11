@@ -1,22 +1,17 @@
-// Auto-generated hook for useDebounce
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-export function useDebounce() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
-    // Mock implementation
-    setTimeout(() => {
-      setData({});
-      setLoading(false);
-    }, 100);
-  }, []);
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
 
-  return {
-    data,
-    loading,
-    error
-  };
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
 }

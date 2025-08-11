@@ -1,7 +1,18 @@
 import React from 'react';
-import { BaseContent } from '@/types/content.types';
 import { ContentCard } from './ContentCard';
 import { Loader2 } from 'lucide-react';
+
+// Local BaseContent interface that matches ContentCard
+interface BaseContent {
+  id: string | number;
+  title: string;
+  title_english?: string;
+  image_url?: string;
+  cover_image?: string;
+  score?: number;
+  status?: string;
+  content_type: 'anime' | 'manga';
+}
 
 interface ContentListProps<T extends BaseContent> {
   items: T[];
@@ -13,10 +24,6 @@ interface ContentListProps<T extends BaseContent> {
   renderItem?: (item: T) => React.ReactNode;
 }
 
-/**
- * Generic content list component - replaces AnimeList, MangaList, etc.
- * Saves ~400 lines of duplicate code
-*/
 export function ContentList<T extends BaseContent>({
   items,
   loading = false,
@@ -70,7 +77,6 @@ export function ContentList<T extends BaseContent>({
   );
 }
 
-// Convenience components for specific content types
 export const AnimeList = (props: Omit<ContentListProps<BaseContent>, 'renderItem'>) => (
   <ContentList {...props} />
 );

@@ -323,3 +323,11 @@ export {
   ChartLegendContent,
   ChartStyle,
 }
+
+// Add type assertions for problematic areas
+declare module 'recharts' {
+  interface TooltipProps {
+    payload?: any;
+    label?: any;
+  }
+}

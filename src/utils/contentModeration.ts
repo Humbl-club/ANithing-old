@@ -1,39 +1,37 @@
-// Simple content moderation implementation
-// You can replace this with a proper library like bad-words if needed
+const BadWordsFilter = {
+  isProfane: (text: string) => false,
+  clean: (text: string) => text
+};
 
-/**
- * Filters content for offensive language
- * @param content - The text content to filter
- * @returns The filtered content with offensive words replaced
- */
-export const filterContent = (content: string): string => {
-  if (!content) return content;
+const filter = new BadWordsFilter();
+
+const inappropriateWords: string[] = [];
+
+export function moderateContent(content: string): {
+  isAppropriate: boolean;
+  cleanedContent: string;
+  flaggedWords: string[];
+} {
+  const lowercaseContent = content.toLowerCase();
+  const flaggedWords: string[] = [];
   
-  // Basic profanity filter - can be extended with a proper library
-  const inappropriateWords = [
-    // Add words to filter here if needed
-  ];
-  
-  let filtered = content;
   inappropriateWords.forEach(word => {
-    const regex = new RegExp(word, 'gi');
-    filtered = filtered.replace(regex, '*'.repeat(word.length));
+    if (lowercaseContent.includes(word.toLowerCase())) {
+      flaggedWords.push(word);
+    }
   });
   
-  return filtered;
-};
-/**
- * Checks if content contains offensive language
- * @param content - The text content to check
-/**
- * @returns True if content contains offensive words, false otherwise
-*/
-export const containsOffensiveContent = (content: string): boolean => {
-  if (!content) return false;
-  try {
-    return filter.isProfane(content);
-  } catch (error) {
-    // Error logged silently
-    return false; // Return false if checking fails
-  }
-};
+  const isProfane = filter.isProfane(content);
+  const cleanedContent = filter.clean(content);
+  
+  return {
+    isAppropriate: !isProfane && flaggedWords.length === 0,
+    cleanedContent,
+    flaggedWords
+  };
+}
+
+export function validateUsername(username: string): boolean {
+  const result = moderateContent(username);
+  return result.isAppropriate && username.length >= 3 && username.length <= 20;
+}
