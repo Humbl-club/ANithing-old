@@ -5,9 +5,18 @@ import dotenv from 'dotenv'
 
 dotenv.config({ path: '.env.local' })
 
+// Validate required environment variables
+if (!process.env.VITE_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('❌ Missing required environment variables:')
+  if (!process.env.VITE_SUPABASE_URL) console.error('   - VITE_SUPABASE_URL')
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) console.error('   - SUPABASE_SERVICE_ROLE_KEY')
+  console.error('Please set these in your .env.local file or environment.')
+  process.exit(1)
+}
+
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4dHBiZ3NqYm1oYnVxb21hcmNyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzUwOTQ3OSwiZXhwIjoyMDYzMDg1NDc5fQ.xBBhMNOy9nGkfYWK1UoJLG_x8_AsBTBp9l3S8oIGgZo'
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
 async function setupDailyImports() {
@@ -168,9 +177,18 @@ import dotenv from 'dotenv'
 
 dotenv.config({ path: '.env.local' })
 
+// Validate required environment variables
+if (!process.env.VITE_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('❌ Missing required environment variables:')
+  if (!process.env.VITE_SUPABASE_URL) console.error('   - VITE_SUPABASE_URL')
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) console.error('   - SUPABASE_SERVICE_ROLE_KEY')
+  console.error('Please set these in your .env.local file or environment.')
+  process.exit(1)
+}
+
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4dHBiZ3NqYm1oYnVxb21hcmNyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzUwOTQ3OSwiZXhwIjoyMDYzMDg1NDc5fQ.xBBhMNOy9nGkfYWK1UoJLG_x8_AsBTBp9l3S8oIGgZo'
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
 async function runManualImport() {
@@ -245,9 +263,18 @@ import dotenv from 'dotenv'
 
 dotenv.config({ path: '.env.local' })
 
+// Validate required environment variables
+if (!process.env.VITE_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('❌ Missing required environment variables:')
+  if (!process.env.VITE_SUPABASE_URL) console.error('   - VITE_SUPABASE_URL')
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) console.error('   - SUPABASE_SERVICE_ROLE_KEY')
+  console.error('Please set these in your .env.local file or environment.')
+  process.exit(1)
+}
+
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4dHBiZ3NqYm1oYnVxb21hcmNyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzUwOTQ3OSwiZXhwIjoyMDYzMDg1NDc5fQ.xBBhMNOy9nGkfYWK1UoJLG_x8_AsBTBp9l3S8oIGgZo'
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
 async function checkImportStatus() {

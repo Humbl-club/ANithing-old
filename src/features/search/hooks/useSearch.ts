@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useDebounce } from '@/shared/hooks/useDebounce';
+import { useDebounce } from '@/hooks/useDebounce';
 import { escapeLikeQuery } from '@/utils/simpleSecurity';
 import type { DomainTitle } from '@/repositories/contentRepository';
 export interface SearchOptions {

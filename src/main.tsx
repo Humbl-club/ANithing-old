@@ -9,6 +9,14 @@ import { toast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { initSentry } from '@/lib/sentry';
 import { setupApiErrorTracking } from '@/lib/api-error-handler';
+// Lazy load mobile optimizations to reduce main bundle size
+const initializeMobileOptimizations = () => {
+  if (typeof window !== 'undefined') {
+    import('@/utils/mobileOptimizations').then(module => {
+      module.initializeMobileOptimizations();
+    });
+  }
+};
 // Ensure React is available globally for development
 if (typeof window !== 'undefined') {
   (window as any).React = React;
@@ -101,10 +109,12 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('online', updateOnlineStatus);
   window.addEventListener('offline', updateOnlineStatus);
 }
-// Initialize Sentry before rendering
-initSentry();
+// Initialize Sentry before rendering (async for bundle optimization)
+initSentry().catch(console.error);
 // Setup API error tracking
 setupApiErrorTracking();
+// Initialize mobile optimizations
+initializeMobileOptimizations();
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <App />

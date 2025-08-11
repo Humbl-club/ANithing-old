@@ -175,7 +175,7 @@ export const RecommendationEngine = React.memo(({
 
   useEffect(() => {
     generateRecommendations();
-  }, [recommendationType, contentType, basedOnTitle]);
+  }, [recommendationType, contentType, basedOnTitle, generateRecommendations]);
 
   // Memoize type icon rendering
   const getTypeIcon = useCallback((type: typeof recommendationType) => {

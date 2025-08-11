@@ -43,8 +43,8 @@ class EnvironmentManager {
     const isProduction = this.isProduction();
     return {
       supabase: {
-        url: getEnvVar('VITE_SUPABASE_URL', 'https://axtpbgsjbmhbuqomarcr.supabase.co'),
-        anonKey: getEnvVar('VITE_SUPABASE_ANON_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4dHBiZ3NqYm1oYnVxb21hcmNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc1MDk0NzksImV4cCI6MjA2MzA4NTQ3OX0.ySdY2C6kZQhKKNfFVaLeLIzGEw00cJy2iJRFhxixqDo'),
+        url: getEnvVar('VITE_SUPABASE_URL', ''),
+        anonKey: getEnvVar('VITE_SUPABASE_ANON_KEY', ''),
       },
       api: {
         baseUrl: getEnvVar('VITE_API_BASE_URL', isProduction ? '/api' : '/api'),
@@ -64,14 +64,17 @@ class EnvironmentManager {
     };
   }
   private validateConfig() {
-    if (!this.config.supabase.url || !this.config.supabase.anonKey) {
-      throw new Error('Missing required Supabase configuration');
+    if (!this.config.supabase.url) {
+      throw new Error('Missing required environment variable: VITE_SUPABASE_URL. Please set this in your .env file or environment variables.');
+    }
+    if (!this.config.supabase.anonKey) {
+      throw new Error('Missing required environment variable: VITE_SUPABASE_ANON_KEY. Please set this in your .env file or environment variables.');
     }
     // Validate URL format
     try {
       new URL(this.config.supabase.url);
     } catch {
-      throw new Error('Invalid Supabase URL format');
+      throw new Error('Invalid Supabase URL format. Please provide a valid URL in VITE_SUPABASE_URL.');
     }
     // Validate timeout
     if (this.config.api.timeout < 1000) {

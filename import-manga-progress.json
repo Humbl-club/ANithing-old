@@ -1,8 +1,9 @@
 {
-  "lastPage": 254,
-  "totalPages": 1653,
-  "totalImported": 12700,
+  "type": "manga",
+  "lastPage": 10,
+  "totalPages": 10,
+  "totalImported": 500,
   "totalSkipped": 0,
   "totalErrors": 0,
-  "timestamp": "2025-08-11T13:02:02.667Z"
+  "timestamp": "2025-08-11T23:01:20.856Z"
 }

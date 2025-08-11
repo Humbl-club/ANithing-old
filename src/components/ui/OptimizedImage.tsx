@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, ImgHTMLAttributes } from 'react';
+import { useState, useEffect, useRef, useCallback, ImgHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
 interface OptimizedImageProps extends ImgHTMLAttributes<HTMLImageElement> {
@@ -31,12 +31,28 @@ export function OptimizedImage({
   const [error, setError] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
+  const loadImage = useCallback(() => {
+    const img = new Image();
+    img.src = getOptimizedUrl(src, quality);
+    img.onload = () => {
+      setImageSrc(getOptimizedUrl(src, quality));
+      setImageLoading(false);
+      setError(false);
+    };
+    img.onerror = () => {
+      setImageSrc(fallback);
+      setImageLoading(false);
+      setError(true);
+    };
+  }, [src, quality, fallback]);
+
   useEffect(() => {
     if (priority) {
       loadImage();
       return;
     }
 
+    const currentRef = imgRef.current;
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -52,31 +68,18 @@ export function OptimizedImage({
       }
     );
 
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
     return () => {
-      if (imgRef.current) {
-        observer.unobserve(imgRef.current);
+      if (currentRef) {
+        observer.unobserve(currentRef);
       }
+      observer.disconnect();
     };
-  }, [src]);
+  }, [src, priority, loadImage]);
 
-  const loadImage = () => {
-    const img = new Image();
-    img.src = getOptimizedUrl(src, quality);
-    img.onload = () => {
-      setImageSrc(getOptimizedUrl(src, quality));
-      setImageLoading(false);
-      setError(false);
-    };
-    img.onerror = () => {
-      setImageSrc(fallback);
-      setImageLoading(false);
-      setError(true);
-    };
-  };
 
   const getOptimizedUrl = (url: string, q: number) => {
     // If it's an external image service that supports optimization
@@ -163,6 +166,7 @@ export function OptimizedBackgroundImage({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const currentContainerRef = containerRef.current;
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -177,14 +181,15 @@ export function OptimizedBackgroundImage({
       { rootMargin: '100px' }
     );
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
+    if (currentContainerRef) {
+      observer.observe(currentContainerRef);
     }
 
     return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
+      if (currentContainerRef) {
+        observer.unobserve(currentContainerRef);
       }
+      observer.disconnect();
     };
   }, [src]);
 

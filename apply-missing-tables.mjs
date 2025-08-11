@@ -1,7 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://axtpbgsjbmhbuqomarcr.supabase.co';
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL) {
+  console.error('Please set VITE_SUPABASE_URL environment variable');
+  console.log('You can find it in your Supabase dashboard under Settings > Project URL');
+  process.exit(1);
+}
 
 if (!SERVICE_ROLE_KEY) {
   console.error('Please set SUPABASE_SERVICE_ROLE_KEY environment variable');

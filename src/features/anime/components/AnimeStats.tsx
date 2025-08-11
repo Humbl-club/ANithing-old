@@ -1,14 +1,49 @@
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import React, { lazy, Suspense } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingUp, Star, Clock, Calendar } from 'lucide-react';
+import { TrendingUp, Star, Clock, Calendar, Loader2 } from 'lucide-react';
+
+// Lazy load recharts components to reduce initial bundle size
+const RechartsComponents = lazy(() => 
+  import('recharts').then(module => ({
+    default: {
+      BarChart: module.BarChart,
+      Bar: module.Bar,
+      XAxis: module.XAxis,
+      YAxis: module.YAxis,
+      CartesianGrid: module.CartesianGrid,
+      Tooltip: module.Tooltip,
+      ResponsiveContainer: module.ResponsiveContainer,
+      PieChart: module.PieChart,
+      Pie: module.Pie,
+      Cell: module.Cell,
+      LineChart: module.LineChart,
+      Line: module.Line,
+    }
+  }))
+);
 interface AnimeStatsProps {
   userAnimeData?: any[];
   userMangaData?: any[];
   className?: string;
 }
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'];
+// Chart loading fallback
+const ChartLoader = () => (
+  <div className="flex items-center justify-center h-[300px]">
+    <Loader2 className="h-8 w-8 animate-spin" />
+  </div>
+);
+
+// Wrapper component for charts
+const ChartWrapper: React.FC<{ children: (components: any) => React.ReactNode }> = ({ children }) => (
+  <Suspense fallback={<ChartLoader />}>
+    <RechartsComponents>
+      {(components) => children(components)}
+    </RechartsComponents>
+  </Suspense>
+);
+
 export const AnimeStats: React.FC<AnimeStatsProps> = ({ 
   userAnimeData = [], 
   userMangaData = [], 
@@ -107,24 +142,28 @@ export const AnimeStats: React.FC<AnimeStatsProps> = ({
                 <CardDescription>Your anime watching progress</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={statusData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({ name, value }) => `${name}: ${value}`}
-                    >
-                      {statusData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                <ChartWrapper>
+                  {({ ResponsiveContainer, PieChart, Pie, Cell, Tooltip }) => (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={statusData}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({ name, value }) => `${name}: ${value}`}
+                        >
+                          {statusData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
+                </ChartWrapper>
               </CardContent>
             </Card>
             <Card>
@@ -133,16 +172,20 @@ export const AnimeStats: React.FC<AnimeStatsProps> = ({
                 <CardDescription>Anime and manga consumption over time</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={yearlyData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="year" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="anime" stroke="hsl(var(--primary))" strokeWidth={2} />
-                    <Line type="monotone" dataKey="manga" stroke="hsl(var(--secondary))" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
+                <ChartWrapper>
+                  {({ ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line }) => (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={yearlyData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="year" />
+                        <YAxis />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="anime" stroke="hsl(var(--primary))" strokeWidth={2} />
+                        <Line type="monotone" dataKey="manga" stroke="hsl(var(--secondary))" strokeWidth={2} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  )}
+                </ChartWrapper>
               </CardContent>
             </Card>
           </div>
@@ -154,15 +197,19 @@ export const AnimeStats: React.FC<AnimeStatsProps> = ({
               <CardDescription>Your most watched genres</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={genreData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="genre" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="hsl(var(--primary))" />
-                </BarChart>
-              </ResponsiveContainer>
+              <ChartWrapper>
+                {({ ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar }) => (
+                  <ResponsiveContainer width="100%" height={400}>
+                    <BarChart data={genreData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="genre" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="hsl(var(--primary))" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+              </ChartWrapper>
             </CardContent>
           </Card>
         </TabsContent>
@@ -173,28 +220,32 @@ export const AnimeStats: React.FC<AnimeStatsProps> = ({
               <CardDescription>Your anime and manga consumption patterns</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={yearlyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="year" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="anime" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={3}
-                    dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="manga" 
-                    stroke="hsl(var(--secondary))" 
-                    strokeWidth={3}
-                    dot={{ fill: 'hsl(var(--secondary))', strokeWidth: 2, r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <ChartWrapper>
+                {({ ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line }) => (
+                  <ResponsiveContainer width="100%" height={400}>
+                    <LineChart data={yearlyData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="year" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line 
+                        type="monotone" 
+                        dataKey="anime" 
+                        stroke="hsl(var(--primary))" 
+                        strokeWidth={3}
+                        dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="manga" 
+                        stroke="hsl(var(--secondary))" 
+                        strokeWidth={3}
+                        dot={{ fill: 'hsl(var(--secondary))', strokeWidth: 2, r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                )}
+              </ChartWrapper>
             </CardContent>
           </Card>
         </TabsContent>
@@ -205,15 +256,19 @@ export const AnimeStats: React.FC<AnimeStatsProps> = ({
               <CardDescription>How you rate your anime</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={ratingDistribution}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="rating" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="hsl(var(--primary))" />
-                </BarChart>
-              </ResponsiveContainer>
+              <ChartWrapper>
+                {({ ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar }) => (
+                  <ResponsiveContainer width="100%" height={400}>
+                    <BarChart data={ratingDistribution}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="rating" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="hsl(var(--primary))" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+              </ChartWrapper>
             </CardContent>
           </Card>
         </TabsContent>

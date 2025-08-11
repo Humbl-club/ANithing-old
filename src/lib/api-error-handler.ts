@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/react';
+// Sentry imported dynamically to reduce bundle size
 import { supabase } from '@/integrations/supabase/client';
 // Intercept Supabase errors
 export const setupApiErrorTracking = () => {
@@ -42,7 +42,8 @@ const wrapQueryResult = (result: any, table: string, operation: string) => {
           if (response?.error) {
             // Error logged silently
             if (import.meta.env.PROD) {
-              Sentry.captureException(new Error(response.error.message), {
+              import('@sentry/react').then(Sentry => {
+                Sentry.captureException(new Error(response.error.message), {
                 tags: {
                   component: 'supabase-api',
                   table,
@@ -55,6 +56,7 @@ const wrapQueryResult = (result: any, table: string, operation: string) => {
                   timestamp: new Date().toISOString(),
                 }
               });
+              });
             }
           }
           return onfulfilled?.(response);
@@ -62,7 +64,8 @@ const wrapQueryResult = (result: any, table: string, operation: string) => {
         (error: any) => {
           // Error logged silently
           if (import.meta.env.PROD) {
-            Sentry.captureException(error, {
+            import('@sentry/react').then(Sentry => {
+              Sentry.captureException(error, {
               tags: {
                 component: 'supabase-api',
                 table,
@@ -73,6 +76,7 @@ const wrapQueryResult = (result: any, table: string, operation: string) => {
                 operation,
                 timestamp: new Date().toISOString(),
               }
+            });
             });
           }
           return onrejected?.(error);
@@ -91,7 +95,8 @@ export const trackApiError = (
 ) => {
   // Error logged silently
   if (import.meta.env.PROD) {
-    Sentry.captureException(error, {
+    import('@sentry/react').then(Sentry => {
+      Sentry.captureException(error, {
       tags: {
         component: 'api',
         endpoint,
@@ -103,6 +108,7 @@ export const trackApiError = (
         context,
         timestamp: new Date().toISOString(),
       }
+    });
     });
   }
 };

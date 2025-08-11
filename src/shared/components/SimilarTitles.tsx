@@ -1,9 +1,14 @@
 import React, { useEffect } from 'react';
 import { ContentCard } from '@/components/generic/ContentCard';
-import { useSimilarContent } from '@/hooks/useSimilarContent';
+import { useSmartSimilarContent } from '@/hooks/useSmartSimilarContent';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 import type { BaseContent } from '@/types/content';
+
+// Update interface to match the hook's return type
+interface SimilarContent extends BaseContent {
+  similarity: number;
+}
 
 interface SimilarTitlesProps {
   contentId: string | number;
@@ -11,7 +16,7 @@ interface SimilarTitlesProps {
 }
 
 export function SimilarTitles({ contentId, contentType }: SimilarTitlesProps) {
-  const { similar, loading, error } = useSimilarContent(contentId, contentType);
+  const { similar, loading, error } = useSmartSimilarContent(contentId.toString(), contentType);
 
   if (loading) return <div>Loading similar titles...</div>;
   if (error) return <div>Error: {error}</div>;

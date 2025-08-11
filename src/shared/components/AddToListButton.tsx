@@ -23,10 +23,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserTitleLists } from "@/hooks/useUserTitleLists";
 import type { AnimeStatus, MangaStatus } from "@/types/userLists";
 import { FeatureWrapper } from "@/shared/components/FeatureWrapper";
-import { type Anime, type Manga } from "@/data/animeData";
+import type { BaseContent } from "@/types/content";
 import { toast } from "sonner";
 interface AddToListButtonProps {
-  item: Anime | Manga;
+  item: BaseContent;
   type: "anime" | "manga";
   variant?: "default" | "outline" | "ghost";
   size?: "sm" | "default" | "lg";

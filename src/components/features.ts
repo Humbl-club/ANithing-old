@@ -1,2 +1,0 @@
-// Feature components exports
-export {};

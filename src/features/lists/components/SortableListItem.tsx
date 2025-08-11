@@ -87,7 +87,7 @@ const SortableListItemComponent = ({
     } else {
       return (item as any).manga_details?.chapters || 50;
     }
-  }, [maxProgress, item.media_type, item]);
+  }, [maxProgress, item]);
 
   const handleProgressIncrement = useCallback(() => {
     const newProgress = Math.min((item.progress || 0) + 1, maxProgressValue);

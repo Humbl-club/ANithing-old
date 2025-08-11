@@ -1,5 +1,4 @@
-import React from 'react';
-import zxcvbn from 'zxcvbn';
+import React, { useState, useEffect } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 interface PasswordStrengthIndicatorProps {
@@ -10,8 +9,27 @@ const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps> = ({
   password,
   className
 }) => {
-  if (!password) return null;
-  const result = zxcvbn(password);
+  const [zxcvbn, setZxcvbn] = useState<any>(null);
+  const [result, setResult] = useState<any>(null);
+
+  useEffect(() => {
+    if (!password || !zxcvbn) return;
+    
+    const analysis = zxcvbn(password);
+    setResult(analysis);
+  }, [password, zxcvbn]);
+
+  useEffect(() => {
+    // Dynamically import zxcvbn only when needed
+    if (password) {
+      import('zxcvbn').then(module => {
+        setZxcvbn(() => module.default);
+      });
+    }
+  }, [password]);
+
+  if (!password || !result) return null;
+  
   const score = result.score; // 0-4 scale
   const feedback = result.feedback;
   const getStrengthLabel = (score: number): string => {

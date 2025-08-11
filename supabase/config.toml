@@ -20,45 +20,14 @@ site_url = "https://7fc28aed-a663-4753-8877-1ca39b8ccf8c.lovableproject.com"
 additional_redirect_urls = ["https://7fc28aed-a663-4753-8877-1ca39b8ccf8c.lovableproject.com"]
 jwt_expiry = 3600
 enable_signup = true
+# JWT secret should be set as environment variable SUPABASE_JWT_SECRET
+# For production, generate a strong secret: openssl rand -base64 32
 
 [auth.email]
 enable_signup = true
 double_confirm_changes = true
 
-[functions.anime-api-new]
-verify_jwt = false
-
-[functions.cached-content-v2]
-verify_jwt = false
-
-[functions.cache-get]
-verify_jwt = false
-
-[functions.cache-set]
-verify_jwt = false
-
-[functions.cache-utils]
-verify_jwt = false
-
-[functions.check-streaming-availability]
-verify_jwt = false
-
-[functions.temp-anilist-populate-enhanced]
-verify_jwt = false
-
-[functions.kitsu-sync-engine-enhanced]
-verify_jwt = false
-
-[functions.anilist-enhanced-population]
-verify_jwt = false
-
-# Newly added functions
-[functions.import-data-enhanced]
-verify_jwt = false
-
-[functions.scheduled-import]
-verify_jwt = false
-
+# Public functions - no authentication required
 [functions.health]
 verify_jwt = false
 
@@ -68,14 +37,50 @@ verify_jwt = false
 [functions.get-content-details]
 verify_jwt = false
 
+# Admin/Import functions - require authentication
+[functions.import-data-enhanced]
+verify_jwt = true
+
+[functions.scheduled-import]
+verify_jwt = true
+
 [functions.import-anime]
-verify_jwt = false
+verify_jwt = true
 
 [functions.import-manga]
-verify_jwt = false
+verify_jwt = true
 
 [functions.import-data]
-verify_jwt = false
+verify_jwt = true
 
 [functions.daily-import]
-verify_jwt = false
+verify_jwt = true
+
+[functions.temp-anilist-populate-enhanced]
+verify_jwt = true
+
+[functions.kitsu-sync-engine-enhanced]
+verify_jwt = true
+
+[functions.anilist-enhanced-population]
+verify_jwt = true
+
+# Cache functions - require authentication to prevent abuse
+[functions.cache-get]
+verify_jwt = true
+
+[functions.cache-set]
+verify_jwt = true
+
+[functions.cache-utils]
+verify_jwt = true
+
+[functions.cached-content-v2]
+verify_jwt = true
+
+# Utility functions - require authentication
+[functions.anime-api-new]
+verify_jwt = true
+
+[functions.check-streaming-availability]
+verify_jwt = true

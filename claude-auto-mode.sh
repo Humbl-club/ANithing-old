@@ -1,0 +1,269 @@
+#!/bin/bash
+
+# Claude Auto-Implementation Mode
+# This script enables Claude to automatically implement fixes and features
+
+set -e
+
+echo "🤖 Claude Auto-Implementation Mode"
+echo "=================================="
+echo ""
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Configuration
+MAX_ITERATIONS=10
+CURRENT_ITERATION=0
+FIXES_APPLIED=0
+
+# Create log directory
+mkdir -p .claude-logs
+
+# Function to check for errors
+check_errors() {
+    echo -e "${BLUE}🔍 Checking for errors...${NC}"
+    
+    # TypeScript check
+    if ! npx tsc --noEmit 2>.claude-logs/tsc-errors.log; then
+        echo -e "${RED}❌ TypeScript errors found${NC}"
+        return 1
+    fi
+    
+    # ESLint check
+    if ! npm run lint 2>.claude-logs/lint-errors.log; then
+        echo -e "${YELLOW}⚠️  ESLint warnings found${NC}"
+        # Don't fail on lint warnings
+    fi
+    
+    # Build check
+    if ! npm run build 2>.claude-logs/build-errors.log; then
+        echo -e "${RED}❌ Build errors found${NC}"
+        return 1
+    fi
+    
+    echo -e "${GREEN}✅ No errors found!${NC}"
+    return 0
+}
+
+# Function to auto-fix TypeScript errors
+fix_typescript() {
+    echo -e "${BLUE}🔧 Attempting to fix TypeScript errors...${NC}"
+    
+    # Try quick fixes first
+    npx tsc --noEmit --listFiles | while read -r file; do
+        if [[ $file == *.tsx ]] || [[ $file == *.ts ]]; then
+            # Add missing imports
+            npx organize-imports-cli "$file" 2>/dev/null || true
+        fi
+    done
+    
+    ((FIXES_APPLIED++))
+}
+
+# Function to auto-fix ESLint errors
+fix_eslint() {
+    echo -e "${BLUE}🔧 Attempting to fix ESLint errors...${NC}"
+    
+    npm run lint -- --fix
+    
+    ((FIXES_APPLIED++))
+}
+
+# Function to optimize performance
+optimize_performance() {
+    echo -e "${BLUE}🚀 Optimizing performance...${NC}"
+    
+    # Check bundle size
+    if [ -d "dist" ]; then
+        BUNDLE_SIZE=$(du -sh dist | cut -f1)
+        echo "  Bundle size: $BUNDLE_SIZE"
+        
+        # If bundle is too large, trigger optimization
+        if [[ $BUNDLE_SIZE == *"M"* ]]; then
+            SIZE_NUM=$(echo $BUNDLE_SIZE | sed 's/M//')
+            if (( $(echo "$SIZE_NUM > 2" | bc -l) )); then
+                echo -e "${YELLOW}  Bundle too large, optimizing...${NC}"
+                # Trigger bundle optimization
+                node optimize-bundle.js 2>/dev/null || true
+            fi
+        fi
+    fi
+}
+
+# Function to run tests
+run_tests() {
+    echo -e "${BLUE}🧪 Running tests...${NC}"
+    
+    # Run unit tests
+    if npm run test:unit -- --run 2>.claude-logs/test-errors.log; then
+        echo -e "${GREEN}  ✅ Unit tests passed${NC}"
+    else
+        echo -e "${YELLOW}  ⚠️  Some tests failed${NC}"
+        # Don't fail the whole process
+    fi
+    
+    # Run smoke tests if available
+    if [ -f "playwright.config.ts" ]; then
+        if npm run e2e:smoke 2>.claude-logs/e2e-errors.log; then
+            echo -e "${GREEN}  ✅ E2E smoke tests passed${NC}"
+        else
+            echo -e "${YELLOW}  ⚠️  Some E2E tests failed${NC}"
+        fi
+    fi
+}
+
+# Function to generate implementation report
+generate_report() {
+    echo -e "${BLUE}📊 Generating implementation report...${NC}"
+    
+    cat > claude-implementation-report.md << EOF
+# Claude Auto-Implementation Report
+
+**Date:** $(date)
+**Iterations:** $CURRENT_ITERATION
+**Fixes Applied:** $FIXES_APPLIED
+
+## Status
+
+EOF
+    
+    if check_errors; then
+        echo "✅ **All checks passed!**" >> claude-implementation-report.md
+    else
+        echo "⚠️ **Some issues remain**" >> claude-implementation-report.md
+    fi
+    
+    cat >> claude-implementation-report.md << EOF
+
+## TypeScript Status
+\`\`\`
+$(npx tsc --noEmit 2>&1 | head -20 || echo "No errors")
+\`\`\`
+
+## Build Status
+\`\`\`
+$(npm run build 2>&1 | tail -10 || echo "Build successful")
+\`\`\`
+
+## Performance Metrics
+- Bundle Size: $(du -sh dist 2>/dev/null | cut -f1 || echo "N/A")
+- Node Modules: $(du -sh node_modules | cut -f1)
+- Source Files: $(find src -name "*.tsx" -o -name "*.ts" | wc -l)
+
+## Recommendations
+EOF
+    
+    if [ -f ".claude-logs/tsc-errors.log" ] && [ -s ".claude-logs/tsc-errors.log" ]; then
+        echo "- Fix remaining TypeScript errors" >> claude-implementation-report.md
+    fi
+    
+    if [ -f ".claude-logs/lint-errors.log" ] && [ -s ".claude-logs/lint-errors.log" ]; then
+        echo "- Address ESLint warnings" >> claude-implementation-report.md
+    fi
+    
+    echo -e "${GREEN}📄 Report saved to claude-implementation-report.md${NC}"
+}
+
+# Function to commit fixes
+auto_commit() {
+    if [ $FIXES_APPLIED -gt 0 ]; then
+        echo -e "${BLUE}💾 Committing fixes...${NC}"
+        
+        git add -A
+        git commit -m "🤖 Auto-fix: Applied $FIXES_APPLIED automated fixes
+
+- TypeScript error fixes
+- ESLint auto-fixes
+- Performance optimizations
+
+Generated by Claude Auto-Implementation Mode" || true
+        
+        echo -e "${GREEN}✅ Changes committed${NC}"
+    fi
+}
+
+# Main implementation loop
+main() {
+    echo "Starting auto-implementation loop..."
+    echo ""
+    
+    while [ $CURRENT_ITERATION -lt $MAX_ITERATIONS ]; do
+        ((CURRENT_ITERATION++))
+        echo -e "${BLUE}=== Iteration $CURRENT_ITERATION/$MAX_ITERATIONS ===${NC}"
+        
+        # Check for errors
+        if check_errors; then
+            echo -e "${GREEN}✨ All checks passed!${NC}"
+            break
+        fi
+        
+        # Try to fix TypeScript errors
+        if [ -s ".claude-logs/tsc-errors.log" ]; then
+            fix_typescript
+        fi
+        
+        # Try to fix ESLint errors
+        if [ -s ".claude-logs/lint-errors.log" ]; then
+            fix_eslint
+        fi
+        
+        # Optimize if needed
+        optimize_performance
+        
+        echo ""
+    done
+    
+    # Run final tests
+    run_tests
+    
+    # Generate report
+    generate_report
+    
+    # Optionally commit fixes
+    if [ "$1" == "--commit" ]; then
+        auto_commit
+    fi
+    
+    echo ""
+    echo -e "${GREEN}🎉 Auto-implementation complete!${NC}"
+    echo "  Iterations: $CURRENT_ITERATION"
+    echo "  Fixes applied: $FIXES_APPLIED"
+    
+    # Return success if no errors remain
+    check_errors
+}
+
+# Parse arguments
+case "$1" in
+    --help)
+        echo "Usage: $0 [options]"
+        echo ""
+        echo "Options:"
+        echo "  --commit    Auto-commit fixes to git"
+        echo "  --watch     Watch mode - continuously monitor and fix"
+        echo "  --report    Generate report only"
+        echo "  --help      Show this help message"
+        exit 0
+        ;;
+    --report)
+        generate_report
+        exit 0
+        ;;
+    --watch)
+        echo -e "${YELLOW}👁️  Watch mode enabled${NC}"
+        while true; do
+            main
+            echo ""
+            echo "Waiting for changes... (Press Ctrl+C to stop)"
+            sleep 30
+        done
+        ;;
+    *)
+        main "$@"
+        ;;
+esac

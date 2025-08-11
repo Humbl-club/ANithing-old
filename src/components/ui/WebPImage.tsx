@@ -1,4 +1,4 @@
-import { useState, useEffect, ImgHTMLAttributes } from 'react';
+import { useState, useEffect, useCallback, ImgHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
 interface WebPImageProps extends ImgHTMLAttributes<HTMLImageElement> {
@@ -33,7 +33,7 @@ export function WebPImage({
   const [hasError, setHasError] = useState(false);
 
   // Generate WebP URL if not provided
-  const getWebPUrl = (originalSrc: string) => {
+  const getWebPUrl = useCallback((originalSrc: string) => {
     if (webpSrc) return webpSrc;
     
     // For external images that support WebP
@@ -55,7 +55,7 @@ export function WebPImage({
     }
     
     return originalSrc;
-  };
+  }, [webpSrc, quality]);
 
   useEffect(() => {
     const checkWebPSupport = () => {
@@ -88,7 +88,7 @@ export function WebPImage({
       setCurrentSrc(src);
       setIsLoading(false);
     }
-  }, [src]);
+  }, [src, getWebPUrl, onLoadStart, onLoadComplete]);
 
   const handleError = () => {
     setHasError(true);

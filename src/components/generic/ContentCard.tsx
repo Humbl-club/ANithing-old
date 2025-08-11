@@ -112,9 +112,9 @@ export const ContentCard = memo(<T extends BaseContent>({
         {/* Type-specific content if provided */}
         {renderTypeSpecific && renderTypeSpecific(content)}
         
-        {/* Add to List Button - Fixed prop name */}
+        {/* Add to List Button */}
         <AddToListButton
-          item={content as any}
+          item={content}
           type={content.content_type}
         />
       </div>

@@ -23,6 +23,7 @@ export const LazyImage = React.memo(({
   const [hasError, setHasError] = useState(false);
   const imgRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    const currentRef = imgRef.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -32,10 +33,15 @@ export const LazyImage = React.memo(({
       },
       { threshold: 0.1, rootMargin: '50px' }
     );
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
+    if (currentRef) {
+      observer.observe(currentRef);
     }
-    return () => observer.disconnect();
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+      observer.disconnect();
+    };
   }, []);
   // Memoize handlers
   const handleLoad = useCallback(() => {

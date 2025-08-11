@@ -7,7 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, MessageSquare, Edit2, Trash2, Send } from "lucide-react";
 import { useComments } from "@/hooks/useComments";
 import { useAuth } from "@/hooks/useAuth";
-import { formatDistanceToNow } from "date-fns";
+// Dynamic import for date-fns to reduce bundle size
+const formatTime = async (date: Date | string | number) => {
+  const { formatDistanceToNow } = await import('date-fns');
+  return formatDistanceToNow(new Date(date), { addSuffix: true });
+};
 interface CommentsSectionProps {
   titleId: string;
   className?: string;
@@ -123,7 +127,7 @@ export const CommentsSection = ({ titleId, className = "" }: CommentsSectionProp
                         {comment.profiles?.username || comment.profiles?.full_name || "Anonymous"}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                        {comment.formatted_time || 'Recently'}
                         {comment.updated_at !== comment.created_at && " (edited)"}
                       </p>
                     </div>

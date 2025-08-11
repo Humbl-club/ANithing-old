@@ -67,7 +67,20 @@
       "Bash(git push:*)",
       "Bash(./cleanup.sh)",
       "Bash(npm audit:*)",
-      "Bash(psql:*)"
+      "Bash(psql:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(npm ls:*)",
+      "Bash(npm run preview:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(for component in ProductionChecklist BulkImportTrigger AnalyticsCharts AdvancedMLRecommendations SystemHealth PendingMatchesManager StreamingPlatformFilter UserManager ContentManager)",
+      "Bash(do echo \"=== Checking $component ===\")",
+      "Bash(done)",
+      "Bash(for component in CastSection CharactersSection CommentsSection ReviewSystem MetadataPanel CreatorsList StudiosList DeepLinkHandler LazySection FeatureWrapper)",
+      "Bash(for component in TagCloud RichSynopsis DetailInfoGrid DetailStatsBar ContentReportModal StreamingLinks OfflinePage)",
+      "Bash(cd:*)",
+      "Bash(open http://localhost:5173)",
+      "Bash(open http://localhost:8080)",
+      "Bash(screencapture:*)"
     ],
     "deny": []
   }

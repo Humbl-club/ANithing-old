@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import validator from 'validator';
 import { Input } from '@/components/ui/input';
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -19,8 +18,15 @@ const EnhancedEmailInput: React.FC<EnhancedEmailInputProps> = ({
 }) => {
   const [validationState, setValidationState] = useState<'idle' | 'valid' | 'invalid' | 'warning'>('idle');
   const [validationMessage, setValidationMessage] = useState<string>('');
+  const [validator, setValidator] = useState<any>(null);
+
+  // Load validator dynamically
   useEffect(() => {
-    if (!value) {
+    import('validator').then(v => setValidator(v.default));
+  }, []);
+  
+  useEffect(() => {
+    if (!value || !validator) {
       setValidationState('idle');
       setValidationMessage('');
       return;
@@ -49,7 +55,7 @@ const EnhancedEmailInput: React.FC<EnhancedEmailInputProps> = ({
     // All good
     setValidationState('valid');
     setValidationMessage('Email looks good!');
-  }, [value]);
+  }, [value, validator]);
   const calculateSimilarity = (str1: string, str2: string): number => {
     const longer = str1.length > str2.length ? str1 : str2;
     const shorter = str1.length > str2.length ? str2 : str1;

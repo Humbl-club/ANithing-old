@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | AniThing</title>
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+        }
+        
+        .error-code {
+            font-size: 8rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .error-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+        
+        .error-message {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-color: transparent;
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .error-code { font-size: 6rem; }
+            .error-title { font-size: 2rem; }
+            .error-message { font-size: 1rem; }
+            .actions { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
+    <div class="container">
+        <div class="error-code">404</div>
+        <h1 class="error-title">Page Not Found</h1>
+        <p class="error-message">
+            Oops! The anime or manga you're looking for seems to have gone on an adventure. 
+            Don't worry, there's plenty more content to explore!
+        </p>
+        
+        <div class="actions">
+            <a href="/" class="btn btn-primary">
+                🏠 Go Home
+            </a>
+            <a href="javascript:history.back()" class="btn">
+                ← Go Back
+            </a>
+            <a href="/trending" class="btn">
+                🔥 Trending
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        // Try to redirect to the app if this is a client-side route
+        if (window.location.pathname !== '/404.html') {
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

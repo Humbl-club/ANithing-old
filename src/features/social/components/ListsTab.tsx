@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,9 +27,9 @@ export function ListsTab() {
     if (user) {
       loadUserLists();
     }
-  }, [user]);
+  }, [user, loadUserLists]);
 
-  const loadUserLists = async () => {
+  const loadUserLists = useCallback(async () => {
     // Mock data for now - replace with actual API call
     const mockLists: UserList[] = [
       {
@@ -65,7 +65,7 @@ export function ListsTab() {
     
     setUserLists(mockLists);
     setIsLoading(false);
-  };
+  }, [user?.id]);
 
   const handleCreateList = async () => {
     if (!newListForm.name.trim()) {

@@ -1,10 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Star, Plus, BookOpen, Play } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+// Use a simpler time formatting to avoid date-fns bundle size
+const simpleTimeAgo = (date: string) => {
+  const now = new Date().getTime();
+  const time = new Date(date).getTime();
+  const diff = now - time;
+  
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  
+  if (days > 0) return `${days}d ago`;
+  if (hours > 0) return `${hours}h ago`;
+  if (minutes > 0) return `${minutes}m ago`;
+  return 'Just now';
+};
 import { toast } from 'sonner';
 interface ActivityItem {
   id: string;
@@ -36,8 +50,8 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     fetchActivities();
-  }, [userId, user]);
-  const fetchActivities = async () => {
+  }, [userId, user, fetchActivities]);
+  const fetchActivities = useCallback(async () => {
     if (!user) return;
     setIsLoading(true);
     try {
@@ -50,7 +64,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'added_to_list':
@@ -158,7 +172,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                       {getActivityIcon(activity.activity_type)}
                     </div>
                     <span className="text-sm text-muted-foreground">
-                      {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
+                      {simpleTimeAgo(activity.created_at)}
                     </span>
                   </div>
                   <p className="text-sm">

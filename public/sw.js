@@ -1,13 +1,24 @@
-const CACHE_NAME = 'anithing-v1';
-const DYNAMIC_CACHE = 'anithing-dynamic-v1';
+const CACHE_NAME = 'anithing-v2';
+const DYNAMIC_CACHE = 'anithing-dynamic-v2';
+const IMAGE_CACHE = 'anithing-images-v2';
+const API_CACHE = 'anithing-api-v2';
 
-// Assets to cache on install
+// Assets to cache on install - optimized for mobile
 const STATIC_ASSETS = [
   '/',
   '/offline.html',
   '/manifest.json',
-  '/favicon.ico'
+  '/favicon.ico',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
+
+// Cache size limits for mobile optimization
+const CACHE_LIMITS = {
+  images: 100, // 100 images max
+  api: 50,     // 50 API responses max
+  dynamic: 25  // 25 pages max
+};
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
@@ -19,19 +30,68 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate event - clean old caches
+// Activate event - clean old caches and manage cache sizes
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME && name !== DYNAMIC_CACHE)
-          .map((name) => caches.delete(name))
-      );
-    })
+    Promise.all([
+      // Clean old caches
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames
+            .filter((name) => 
+              !name.includes('anithing-v2') && 
+              (name.includes('anithing') || name.includes('workbox'))
+            )
+            .map((name) => caches.delete(name))
+        );
+      }),
+      // Initialize cache limits
+      manageCacheSize(IMAGE_CACHE, CACHE_LIMITS.images),
+      manageCacheSize(API_CACHE, CACHE_LIMITS.api),
+      manageCacheSize(DYNAMIC_CACHE, CACHE_LIMITS.dynamic)
+    ])
   );
   self.clients.claim();
 });
+
+// Cache management function
+async function manageCacheSize(cacheName, maxItems) {
+  const cache = await caches.open(cacheName);
+  const keys = await cache.keys();
+  
+  if (keys.length > maxItems) {
+    // Remove oldest entries (FIFO)
+    const keysToDelete = keys.slice(0, keys.length - maxItems);
+    await Promise.all(keysToDelete.map(key => cache.delete(key)));
+  }
+}
+
+// Network detection
+function getNetworkSpeed() {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (!connection) return 'unknown';
+  
+  return connection.effectiveType || connection.type || 'unknown';
+}
+
+// Adaptive caching based on network speed
+function shouldCacheResponse(response, networkSpeed) {
+  if (!response || response.status !== 200) return false;
+  
+  const contentLength = response.headers.get('content-length');
+  const size = contentLength ? parseInt(contentLength, 10) : 0;
+  
+  // On slow networks, be more selective about what to cache
+  if (networkSpeed === 'slow-2g' || networkSpeed === '2g') {
+    return size < 100000; // 100KB limit on slow networks
+  }
+  
+  if (networkSpeed === '3g') {
+    return size < 500000; // 500KB limit on 3G
+  }
+  
+  return size < 2000000; // 2MB limit on faster networks
+}
 
 // Fetch event - network first, fallback to cache
 self.addEventListener('fetch', (event) => {

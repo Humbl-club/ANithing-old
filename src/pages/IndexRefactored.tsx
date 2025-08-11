@@ -10,7 +10,7 @@ import { HeroSection } from "@/features/home/components/HeroSection";
 import { ContentSection } from "@/features/home/components/ContentSection";
 import { StatsSection } from "@/features/home/components/StatsSection";
 import { HealthStatus } from "@/features/home/components/HealthStatus";
-import { SearchResults } from "@/features/search/components/SearchResults";
+import { SearchResultsGrid } from "@/features/search/components/SearchResultsGrid";
 import { TrendingContentSection } from "@/features/home/components/TrendingContentSection";
 // Hooks
 import { useHomePageData } from "@/features/home/hooks/useHomePageData";
@@ -109,7 +109,7 @@ const IndexRefactored = memo(() => {
       
       {/* Search Results or Content Sections */}
       {isSearching && hasSearchResults ? (
-        <SearchResults 
+        <SearchResultsGrid 
           results={searchResults.items}
           totalCount={searchResults.total}
           isLoading={searchResults.isSearching}

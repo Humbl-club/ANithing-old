@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search, Loader2, X, Clock, Sparkles, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useUnifiedSearch } from '@/hooks/useUnifiedSearch';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { AnimatePresence, motion } from 'framer-motion';
 interface UnifiedSearchBarProps {
