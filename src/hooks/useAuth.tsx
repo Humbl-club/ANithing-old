@@ -23,17 +23,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('🔐 Auth useEffect starting...');
     setLoading(true);
+    
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('🔐 Got session:', !!session);
       setUser(session?.user ?? null);
+      setLoading(false);
+      console.log('🔐 Auth loading complete');
+    }).catch((error) => {
+      console.error('🔐 Auth session error:', error);
       setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('🔐 Auth state changed:', _event, !!session);
       setUser(session?.user ?? null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log('🔐 Auth cleanup');
+      subscription.unsubscribe();
+    };
   }, []);
 
   const validatePassword = (password: string) => {
