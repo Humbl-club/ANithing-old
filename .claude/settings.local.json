@@ -80,7 +80,9 @@
       "Bash(cd:*)",
       "Bash(open http://localhost:5173)",
       "Bash(open http://localhost:8080)",
-      "Bash(screencapture:*)"
+      "Bash(screencapture:*)",
+      "WebFetch(domain:localhost)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": []
   }
