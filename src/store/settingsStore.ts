@@ -217,6 +217,16 @@ export const useSettingsStore = create<SettingsState>()(
           preferences: { ...get().settings.preferences, ...updates } 
         };
         set({ settings: newSettings, hasChanges: true });
+        
+        // Auto-save critical preferences immediately
+        if (updates.theme || updates.language) {
+          try {
+            await get().saveToSupabase();
+            get().markSaved();
+          } catch (error) {
+            console.error('Failed to auto-save preferences:', error);
+          }
+        }
       },
 
       updateNotifications: async (updates: Partial<NotificationSettings>) => {
@@ -278,30 +288,70 @@ export const useSettingsStore = create<SettingsState>()(
               favorite_genres: profileData.data.favorite_genres || []
             };
             loadedSettings.account.username = profileData.data.username || '';
+            loadedSettings.account.email = user.email || '';
           }
 
-          // Merge preferences data
+          // Merge comprehensive preferences data
           if (preferencesData.data) {
             const prefs = preferencesData.data;
-            loadedSettings.preferences.theme = prefs.theme || defaultSettings.preferences.theme;
-            loadedSettings.preferences.language = prefs.language || defaultSettings.preferences.language;
-            loadedSettings.preferences.title_language = prefs.title_language || defaultSettings.preferences.title_language;
-            loadedSettings.preferences.auto_play_trailers = prefs.auto_play_trailers ?? defaultSettings.preferences.auto_play_trailers;
+            
+            // Appearance preferences
+            loadedSettings.preferences = {
+              theme: prefs.theme || defaultSettings.preferences.theme,
+              language: prefs.language || defaultSettings.preferences.language,
+              title_language: prefs.title_language || defaultSettings.preferences.title_language,
+              content_filter: prefs.content_filter || (prefs.show_adult_content === false ? 'no_adult' : defaultSettings.preferences.content_filter),
+              default_list_view: prefs.default_list_view || defaultSettings.preferences.default_list_view,
+              items_per_page: prefs.items_per_page || defaultSettings.preferences.items_per_page,
+              auto_play_trailers: prefs.auto_play_trailers ?? defaultSettings.preferences.auto_play_trailers,
+              show_spoilers: prefs.show_spoilers ?? defaultSettings.preferences.show_spoilers,
+              compact_mode: prefs.compact_mode ?? defaultSettings.preferences.compact_mode,
+              glassmorphism: prefs.glassmorphism_enabled ?? defaultSettings.preferences.glassmorphism,
+              animations: prefs.animations_enabled ?? defaultSettings.preferences.animations,
+              data_saver: prefs.data_saver_mode ?? defaultSettings.preferences.data_saver,
+            };
             
             // Notification settings
-            loadedSettings.notifications.email_notifications = prefs.email_notifications ?? defaultSettings.notifications.email_notifications;
-            loadedSettings.notifications.email_on_episode_release = prefs.email_on_episode_release ?? defaultSettings.notifications.email_on_episode_release;
-            loadedSettings.notifications.email_on_friend_activity = prefs.email_on_friend_activity ?? defaultSettings.notifications.email_on_friend_activity;
-            loadedSettings.notifications.push_notifications = prefs.push_notifications ?? defaultSettings.notifications.push_notifications;
-            loadedSettings.notifications.push_on_episode_release = prefs.push_on_episode_release ?? defaultSettings.notifications.push_on_episode_release;
+            loadedSettings.notifications = {
+              email_notifications: prefs.email_notifications ?? defaultSettings.notifications.email_notifications,
+              email_on_episode_release: prefs.email_on_episode_release ?? defaultSettings.notifications.email_on_episode_release,
+              email_on_friend_activity: prefs.email_on_friend_activity ?? defaultSettings.notifications.email_on_friend_activity,
+              email_on_list_updates: prefs.email_on_list_updates ?? defaultSettings.notifications.email_on_list_updates,
+              email_weekly_digest: prefs.email_weekly_digest ?? defaultSettings.notifications.email_weekly_digest,
+              push_notifications: prefs.push_notifications ?? defaultSettings.notifications.push_notifications,
+              push_on_episode_release: prefs.push_on_episode_release ?? defaultSettings.notifications.push_on_episode_release,
+              push_on_friend_activity: prefs.push_on_friend_activity ?? defaultSettings.notifications.push_on_friend_activity,
+              push_on_achievements: prefs.push_on_achievements ?? defaultSettings.notifications.push_on_achievements,
+              in_app_notifications: prefs.in_app_notifications ?? defaultSettings.notifications.in_app_notifications,
+              sound_effects: prefs.sound_effects ?? defaultSettings.notifications.sound_effects,
+            };
             
             // Privacy settings
-            loadedSettings.privacy.profile_visibility = prefs.profile_visibility || defaultSettings.privacy.profile_visibility;
-            loadedSettings.privacy.show_progress = prefs.show_watching_status ?? defaultSettings.privacy.show_progress;
-            loadedSettings.privacy.allow_friend_requests = prefs.allow_friend_requests ?? defaultSettings.privacy.allow_friend_requests;
+            loadedSettings.privacy = {
+              profile_visibility: prefs.profile_visibility || defaultSettings.privacy.profile_visibility,
+              list_visibility: prefs.list_visibility || defaultSettings.privacy.list_visibility,
+              activity_visibility: prefs.activity_visibility || defaultSettings.privacy.activity_visibility,
+              show_progress: prefs.show_watching_status ?? defaultSettings.privacy.show_progress,
+              show_ratings: prefs.show_ratings ?? defaultSettings.privacy.show_ratings,
+              show_reviews: prefs.show_reviews ?? defaultSettings.privacy.show_reviews,
+              allow_friend_requests: prefs.allow_friend_requests ?? defaultSettings.privacy.allow_friend_requests,
+              show_online_status: prefs.show_online_status ?? defaultSettings.privacy.show_online_status,
+              data_collection: prefs.data_collection_consent ?? defaultSettings.privacy.data_collection,
+            };
+            
+            // Import/Export settings
+            loadedSettings.importExport = {
+              mal_sync_enabled: prefs.mal_sync_enabled ?? defaultSettings.importExport.mal_sync_enabled,
+              mal_username: prefs.mal_username || defaultSettings.importExport.mal_username,
+              anilist_sync_enabled: prefs.anilist_sync_enabled ?? defaultSettings.importExport.anilist_sync_enabled,
+              anilist_username: prefs.anilist_username || defaultSettings.importExport.anilist_username,
+              auto_sync: prefs.auto_sync_enabled ?? defaultSettings.importExport.auto_sync,
+              sync_frequency: prefs.sync_frequency || defaultSettings.importExport.sync_frequency,
+              last_sync: prefs.last_sync_date || defaultSettings.importExport.last_sync,
+            };
           }
 
-          set({ settings: loadedSettings });
+          set({ settings: loadedSettings, hasChanges: false });
         } catch (error) {
           console.error('Failed to load settings:', error);
           set({ error: 'Failed to load settings' });
@@ -319,43 +369,80 @@ export const useSettingsStore = create<SettingsState>()(
 
           const { settings } = get();
 
-          // Save to user_preferences
+          // Prepare preference data with all current settings
+          const preferenceData = {
+            user_id: user.id,
+            theme: settings.preferences.theme,
+            language: settings.preferences.language,
+            title_language: settings.preferences.title_language,
+            show_adult_content: settings.preferences.content_filter !== 'family_friendly',
+            auto_play_trailers: settings.preferences.auto_play_trailers,
+            default_list_view: settings.preferences.default_list_view,
+            items_per_page: settings.preferences.items_per_page,
+            compact_mode: settings.preferences.compact_mode,
+            glassmorphism_enabled: settings.preferences.glassmorphism,
+            animations_enabled: settings.preferences.animations,
+            data_saver_mode: settings.preferences.data_saver,
+            show_spoilers: settings.preferences.show_spoilers,
+            content_filter: settings.preferences.content_filter,
+            
+            // Notification settings
+            email_notifications: settings.notifications.email_notifications,
+            email_on_episode_release: settings.notifications.email_on_episode_release,
+            email_on_friend_activity: settings.notifications.email_on_friend_activity,
+            email_on_list_updates: settings.notifications.email_on_list_updates,
+            email_weekly_digest: settings.notifications.email_weekly_digest,
+            push_notifications: settings.notifications.push_notifications,
+            push_on_episode_release: settings.notifications.push_on_episode_release,
+            push_on_friend_activity: settings.notifications.push_on_friend_activity,
+            push_on_achievements: settings.notifications.push_on_achievements,
+            in_app_notifications: settings.notifications.in_app_notifications,
+            sound_effects: settings.notifications.sound_effects,
+            
+            // Privacy settings
+            profile_visibility: settings.privacy.profile_visibility,
+            list_visibility: settings.privacy.list_visibility,
+            activity_visibility: settings.privacy.activity_visibility,
+            show_watching_status: settings.privacy.show_progress,
+            show_ratings: settings.privacy.show_ratings,
+            show_reviews: settings.privacy.show_reviews,
+            allow_friend_requests: settings.privacy.allow_friend_requests,
+            show_online_status: settings.privacy.show_online_status,
+            data_collection_consent: settings.privacy.data_collection,
+            
+            // Import/Export settings
+            mal_sync_enabled: settings.importExport.mal_sync_enabled,
+            mal_username: settings.importExport.mal_username,
+            anilist_sync_enabled: settings.importExport.anilist_sync_enabled,
+            anilist_username: settings.importExport.anilist_username,
+            auto_sync_enabled: settings.importExport.auto_sync,
+            sync_frequency: settings.importExport.sync_frequency,
+            last_sync_date: settings.importExport.last_sync,
+            
+            updated_at: new Date().toISOString()
+          };
+
+          // Save to user_preferences with comprehensive data
           await supabase
             .from('user_preferences')
-            .upsert({
-              user_id: user.id,
-              theme: settings.preferences.theme,
-              language: settings.preferences.language,
-              title_language: settings.preferences.title_language,
-              show_adult_content: settings.preferences.content_filter !== 'family_friendly',
-              auto_play_trailers: settings.preferences.auto_play_trailers,
-              email_notifications: settings.notifications.email_notifications,
-              email_on_episode_release: settings.notifications.email_on_episode_release,
-              email_on_friend_activity: settings.notifications.email_on_friend_activity,
-              push_notifications: settings.notifications.push_notifications,
-              push_on_episode_release: settings.notifications.push_on_episode_release,
-              profile_visibility: settings.privacy.profile_visibility,
-              show_watching_status: settings.privacy.show_progress,
-              allow_friend_requests: settings.privacy.allow_friend_requests,
-              updated_at: new Date().toISOString()
-            });
+            .upsert(preferenceData);
 
           // Save profile data
-          if (settings.profile.display_name || settings.profile.bio) {
-            await supabase
-              .from('profiles')
-              .upsert({
-                id: user.id,
-                display_name: settings.profile.display_name || null,
-                avatar_url: settings.profile.avatar_url || null,
-                bio: settings.profile.bio || null,
-                location: settings.profile.location || null,
-                website: settings.profile.website || null,
-                twitter_handle: settings.profile.twitter_handle || null,
-                favorite_genres: settings.profile.favorite_genres,
-                updated_at: new Date().toISOString()
-              });
-          }
+          const profileData = {
+            id: user.id,
+            display_name: settings.profile.display_name || null,
+            avatar_url: settings.profile.avatar_url || null,
+            bio: settings.profile.bio || null,
+            location: settings.profile.location || null,
+            website: settings.profile.website || null,
+            twitter_handle: settings.profile.twitter_handle || null,
+            favorite_genres: settings.profile.favorite_genres,
+            updated_at: new Date().toISOString()
+          };
+
+          await supabase
+            .from('profiles')
+            .upsert(profileData);
 
         } catch (error) {
           console.error('Failed to save settings:', error);

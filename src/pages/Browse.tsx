@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Navigation } from '@/layouts/components/Navigation';
 import { EmailVerificationBanner } from '@/features/user/components/EmailVerificationBanner';
+import { useSearch } from '@/features/search/hooks/useSearch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -65,6 +66,13 @@ const Browse = () => {
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
+  // Use the existing search hook for actual search functionality
+  const { 
+    results, 
+    loading: searchLoading, 
+    handleSearch 
+  } = useSearch();
+  
   // Filter states
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [selectedType, setSelectedType] = useState(searchParams.get('type') || 'all');
@@ -73,6 +81,34 @@ const Browse = () => {
   const [selectedStatus, setSelectedStatus] = useState(searchParams.get('status') || '');
   const [selectedYear, setSelectedYear] = useState(searchParams.get('year') || '');
   const [minRating, setMinRating] = useState(searchParams.get('rating') || '');
+
+  // Perform search when query changes
+  const performSearch = useCallback(async () => {
+    if (searchQuery.trim()) {
+      setLoading(true);
+      try {
+        await handleSearch(searchQuery, selectedType as any);
+        // Use search results if available, otherwise use mock data
+        if (results && results.length > 0) {
+          setContent(results);
+        } else {
+          // Filter mock content based on search query
+          const filtered = mockContent.filter(item => 
+            item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase()))
+          );
+          setContent(filtered);
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+        setContent(mockContent);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setContent(mockContent);
+    }
+  }, [searchQuery, selectedType, handleSearch, results]);
 
   // Update URL when filters change
   const updateFilters = useCallback(() => {
