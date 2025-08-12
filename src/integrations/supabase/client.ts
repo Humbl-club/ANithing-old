@@ -14,12 +14,13 @@ export const supabase = createClient<Database>(
       detectSessionInUrl: true,
       flowType: 'pkce'
     },
-    global: {
-      headers: {
-        'x-application-name': env.get('app.name'),
-        'x-application-version': env.get('app.version')
-      }
-    },
+    // Removed custom headers to avoid CORS issues with edge functions
+    // global: {
+    //   headers: {
+    //     'x-application-name': env.get('app.name'),
+    //     'x-application-version': env.get('app.version')
+    //   }
+    // },
     realtime: {
       params: {
         eventsPerSecond: 10
