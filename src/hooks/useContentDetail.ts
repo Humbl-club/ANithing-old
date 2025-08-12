@@ -13,7 +13,10 @@ export function useContentDetail<T extends BaseContent>(
   return useQuery({
     queryKey: ['content', contentType, contentId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Handle both UUID and AniList ID formats
+      const isUuid = contentId && contentId.includes('-')
+      
+      let query = supabase
         .from('titles')
         .select(`
           *,
@@ -21,8 +24,16 @@ export function useContentDetail<T extends BaseContent>(
           title_genres(genres(*)),
           ${contentType === 'anime' ? 'title_studios(studios(*))' : 'title_authors(authors(*))'}
         `)
-        .eq('id', contentId)
-        .single();
+        .eq('content_type', contentType)
+      
+      if (isUuid) {
+        query = query.eq('id', contentId)
+      } else {
+        // Assume it's an AniList ID (numeric)
+        query = query.eq('anilist_id', parseInt(contentId))
+      }
+
+      const { data, error } = await query.single();
 
       if (error) throw error;
       return data as T;
