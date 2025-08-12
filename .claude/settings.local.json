@@ -84,7 +84,12 @@
       "WebFetch(domain:localhost)",
       "mcp__ide__getDiagnostics",
       "Bash(npx playwright test:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(open:*)",
+      "Bash(open:*)",
+      "Bash(open:*)",
+      "Bash(open:*)",
+      "Bash(open:*)"
     ],
     "deny": []
   }
