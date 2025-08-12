@@ -17,7 +17,7 @@ import {
   Clock, 
   CheckCircle,
   AlertCircle,
-  Sync,
+  RotateCcw,
   FileText,
   Database,
   AlertTriangle,
@@ -277,7 +277,7 @@ export const ImportExportSettings = () => {
                 onClick={handleMALSync}
                 disabled={!importExport.mal_sync_enabled || !importExport.mal_username || syncing}
               >
-                {syncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sync className="w-4 h-4" />}
+                {syncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
               </Button>
             </div>
           </div>
@@ -337,7 +337,7 @@ export const ImportExportSettings = () => {
                 onClick={handleAniListSync}
                 disabled={!importExport.anilist_sync_enabled || !importExport.anilist_username || syncing}
               >
-                {syncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sync className="w-4 h-4" />}
+                {syncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
               </Button>
             </div>
           </div>
