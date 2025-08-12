@@ -62,6 +62,38 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				glass: {
+					DEFAULT: 'hsl(var(--glass-bg))',
+					border: 'hsl(var(--glass-border))',
+					hover: 'hsl(var(--glass-hover))',
+					focus: 'hsl(var(--glass-focus))'
+				},
+				pink: {
+					50: 'hsl(329 100% 98%)',
+					100: 'hsl(329 100% 95%)',
+					200: 'hsl(329 96% 87%)',
+					300: 'hsl(329 87% 77%)',
+					400: 'hsl(329 86% 65%)',
+					500: 'hsl(329 75% 51%)',
+					600: 'hsl(329 70% 42%)',
+					700: 'hsl(329 69% 33%)',
+					800: 'hsl(329 67% 27%)',
+					900: 'hsl(329 65% 23%)',
+					950: 'hsl(329 80% 14%)'
+				},
+				purple: {
+					50: 'hsl(270 100% 98%)',
+					100: 'hsl(269 100% 95%)',
+					200: 'hsl(269 100% 92%)',
+					300: 'hsl(269 97% 85%)',
+					400: 'hsl(270 95% 75%)',
+					500: 'hsl(270 91% 65%)',
+					600: 'hsl(271 81% 56%)',
+					700: 'hsl(272 72% 47%)',
+					800: 'hsl(272 67% 39%)',
+					900: 'hsl(273 66% 32%)',
+					950: 'hsl(274 87% 21%)'
 				}
 			},
 			backgroundImage: {
