@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ContentList } from '@/components/generic/ContentList';
@@ -21,6 +21,7 @@ interface ContentBrowseProps {
  */
 export function ContentBrowse({ contentType }: ContentBrowseProps) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [genre, setGenre] = useState(searchParams.get('genre') || '');
   const [status, setStatus] = useState(searchParams.get('status') || '');
@@ -124,6 +125,12 @@ export function ContentBrowse({ contentType }: ContentBrowseProps) {
     ? ['RELEASING', 'FINISHED', 'NOT_YET_RELEASED', 'CANCELLED']
     : ['RELEASING', 'FINISHED', 'NOT_YET_RELEASED', 'CANCELLED', 'HIATUS'];
 
+  // Handle content click navigation
+  const handleContentClick = useCallback((content: BaseContent) => {
+    const type = content.content_type || contentType;
+    navigate(`/${type}/${content.id}`);
+  }, [navigate, contentType]);
+
   return (
     <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
@@ -224,6 +231,7 @@ export function ContentBrowse({ contentType }: ContentBrowseProps) {
             error={error as Error | null}
             columns={view === 'grid' ? 6 : 1}
             emptyMessage={`No ${contentType} found`}
+            onItemClick={handleContentClick}
           />
         </motion.div>
       </AnimatePresence>

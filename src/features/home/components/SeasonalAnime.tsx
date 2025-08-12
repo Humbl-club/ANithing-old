@@ -1,6 +1,7 @@
 import React, { memo, useState, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { AnimeCard } from '@/shared/components/AnimeCard';
+import { LazyImage } from '@/components/ui/lazy-image';
 import { 
   Calendar,
   Sun,
@@ -261,8 +262,8 @@ const SeasonalAnime = memo(({ onItemClick }: SeasonalAnimeProps) => {
             <div className="grid md:grid-cols-3 gap-6">
               <div className="md:col-span-1">
                 <div className="aspect-[3/4] rounded-xl overflow-hidden">
-                  <img 
-                    src={currentData[0].cover_image} 
+                  <LazyImage
+                    src={currentData[0].image_url || currentData[0].cover_image || ''}
                     alt={getDisplayName(currentData[0])}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
