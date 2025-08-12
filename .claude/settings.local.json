@@ -89,7 +89,9 @@
       "Bash(open:*)",
       "Bash(open:*)",
       "Bash(open:*)",
-      "Bash(open:*)"
+      "Bash(open:*)",
+      "Bash(npm run test:e2e:*)",
+      "Bash(osascript:*)"
     ],
     "deny": []
   }

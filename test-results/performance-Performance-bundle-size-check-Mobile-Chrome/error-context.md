@@ -1,0 +1,129 @@
+# Page snapshot
+
+```yaml
+- region "Notifications (F8)":
+  - list
+- img
+- text: Online
+- navigation:
+  - link "ANITHING Anime & Manga Hub":
+    - /url: /
+    - img
+    - text: ANITHING Anime & Manga Hub
+  - button:
+    - img
+- img
+- heading "Unlock Your Personalized Experience" [level=2]
+- paragraph: Sign in to get personalized recommendations, track your progress, and discover anime based on your unique taste.
+- button "Sign In"
+- button "Create Account"
+- paragraph: Free forever • No spam • Your data stays private
+- img
+- heading "Trending Now" [level=2]
+- paragraph: Hottest right now • 0 titles
+- button:
+  - img
+- button:
+  - img
+- button "Filters":
+  - img
+  - text: Filters
+- button "View All":
+  - text: View All
+  - img
+- button "🔥 All"
+- button "📺 Anime"
+- button "📚 Manga"
+- button "Today Hottest right now":
+  - img
+  - text: Today Hottest right now
+- button "This Week Weekly favorites":
+  - img
+  - text: This Week Weekly favorites
+- button "This Month Monthly top picks":
+  - img
+  - text: This Month Monthly top picks
+- img
+- text: Updated 10:19 AM
+- img
+- text: 0 highly rated
+- img
+- text: 52k discussions
+- button "View All Trending Content":
+  - text: View All Trending Content
+  - img
+- img
+- heading "Seasonal Anime ☀️" [level=2]
+- paragraph: Summer 2025 • 0 titles
+- button "Airing"
+- button "Upcoming"
+- button "Genre":
+  - img
+  - text: Genre
+- button "View Calendar":
+  - text: View Calendar
+  - img
+- button "Winter 2026 Coming Soon":
+  - img
+  - text: Winter 2026 Coming Soon
+- button "Spring 2026 Coming Soon":
+  - img
+  - text: Spring 2026 Coming Soon
+- 'button "Summer 2025 Current Season Airing: 0 Upcoming: 0"':
+  - img
+  - text: "Summer 2025 Current Season Airing: 0 Upcoming: 0"
+- button "Fall 2025 Coming Soon":
+  - img
+  - text: Fall 2025 Coming Soon
+- heading "All Summer 2025 Anime" [level=3]
+- text: Showing currently airing titles
+- button "View Full Summer Calendar":
+  - text: View Full Summer Calendar
+  - img
+- img
+- heading "No Content Available Yet" [level=3]
+- paragraph: We're working on populating the database with amazing anime and manga content. Check back soon for trending titles, recommendations, and more!
+- button "Refresh Page"
+- button "Search Content"
+- contentinfo:
+  - heading "Legal" [level=3]
+  - link "Privacy Policy":
+    - /url: /legal/privacy_policy
+    - img
+    - text: Privacy Policy
+  - link "Terms of Service":
+    - /url: /legal/terms_of_service
+    - img
+    - text: Terms of Service
+  - link "Content Policy":
+    - /url: /legal/content_policy
+    - img
+    - text: Content Policy
+  - link "Copyright Policy":
+    - /url: /legal/copyright_policy
+    - img
+    - text: Copyright Policy
+  - heading "Data Sources" [level=3]
+  - link "API Attributions":
+    - /url: /legal/attributions
+    - img
+    - text: API Attributions
+  - link "Jikan API":
+    - /url: https://jikan.moe
+  - heading "Star Dust Anime" [level=3]
+  - paragraph: Track your anime and manga journey with AI-powered recommendations.
+  - paragraph: Built with ❤️ for the anime community.
+  - heading "Content Rating" [level=3]
+  - paragraph: "This app contains content with various age ratings:"
+  - list:
+    - listitem: "• All Ages: Suitable for everyone"
+    - listitem: "• Teen: Ages 13+"
+    - listitem: "• Mature: Ages 17+"
+    - listitem: "• Adult: Ages 18+"
+  - paragraph: Age verification required for appropriate content filtering.
+  - paragraph: © 2024 Star Dust Anime. All rights reserved.
+  - text: App Store Ready DMCA Compliant Content Moderated
+  - paragraph: Content sourced from public APIs with proper attribution.
+  - paragraph: All anime and manga content remains property of respective copyright holders.
+- text: "Health: error"
+```
