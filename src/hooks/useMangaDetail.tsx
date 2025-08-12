@@ -56,9 +56,9 @@ export const useMangaDetail = (mangaId: string): UseMangaDetailResult => {
       logger.debug(`🚀 Fetching consolidated manga details for: ${mangaId}`);
       const { data, error } = await supabase.functions.invoke('get-content-details', {
         body: {
-          content_id: mangaId,
-          type: 'manga',
-          user_id: user?.id
+          contentId: mangaId,
+          contentType: 'manga',
+          includeRecommendations: true
         }
       });
       if (error) {
