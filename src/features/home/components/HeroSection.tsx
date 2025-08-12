@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
 import { UnifiedSearchBar } from "@/features/search/components/UnifiedSearchBar";
+import { LazyImage } from "@/components/ui/lazy-image";
 import heroImage from "@/assets/anime-hero-bg.jpg";
 import { useStats } from "@/hooks/useStats";
 interface HeroSectionProps {
@@ -12,8 +13,8 @@ export const HeroSection = ({ onSearch }: HeroSectionProps) => {
     <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center justify-center overflow-hidden pt-16 md:pt-20">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src={heroImage} 
+        <LazyImage
+          src={heroImage}
           alt="Anime Hero Background"
           className="w-full h-full object-cover"
         />
