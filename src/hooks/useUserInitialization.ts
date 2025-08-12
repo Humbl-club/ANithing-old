@@ -3,7 +3,7 @@ import { useAuth } from './useAuth';
 import { useInitializationStore } from '@/store/initializationStore';
 
 export const useUserInitialization = () => {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { 
     isInitialized, 
     isLoading, 
