@@ -7,6 +7,22 @@ export const useUserInitialization = () => {
   const { isInitialized, setIsInitialized } = useInitializationStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Failsafe timeout to prevent infinite hanging
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!isInitialized) {
+        console.warn('⚠️ Initialization timeout - forcing completion');
+        setIsInitialized(true);
+      }
+    }, 10000); // 10 second timeout
+
+    if (isInitialized) {
+      clearTimeout(timeout);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [isInitialized, setIsInitialized]);
 
   useEffect(() => {
     const initializeUser = async () => {

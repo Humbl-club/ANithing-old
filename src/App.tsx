@@ -213,7 +213,11 @@ const App = () => {
               <Toaster />
               <AuthProvider>
                 <InitializationWrapper>
-                  {appContent}
+                  {!isInitialized ? (
+                    <InitializationLoader />
+                  ) : (
+                    appContent
+                  )}
                 </InitializationWrapper>
               </AuthProvider>
             </TooltipProvider>
