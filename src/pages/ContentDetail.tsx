@@ -194,7 +194,7 @@ export function ContentDetail({ contentType }: ContentDetailProps) {
                   <AlertDescription className="text-sm">
                     {isNetworkError ? 'Check your internet connection and try again.' :
                      isNotFound ? `This ${contentType} might have been removed or the link is broken.` :
-                     error || 'An unexpected error occurred while loading the content.'}
+                     errorMessage || 'An unexpected error occurred while loading the content.'}
                   </AlertDescription>
                 </div>
               </div>
