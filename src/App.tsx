@@ -115,36 +115,6 @@ persistQueryClient({
   },
 });
 
-// Route renderer component - separated for optimization
-const RouteRenderer = memo(({ route }: { route: typeof routes[0] }) => {
-  const { path, element: Component, protected: isProtected } = route;
-  
-  const element = useMemo(() => {
-    if (isProtected) {
-      return (
-        <ProtectedRoute>
-          <Component />
-        </ProtectedRoute>
-      );
-    }
-    return <Component />;
-  }, [Component, isProtected]);
-  
-  return (
-    <Route
-      key={path}
-      path={path}
-      element={
-        <ErrorBoundary>
-          <Suspense fallback={<PageLoader />}>
-            {element}
-          </Suspense>
-        </ErrorBoundary>
-      }
-    />
-  );
-});
-
 // Main App Content Component with intelligent preloading - memoized
 const AppContent = memo(() => {
   const location = useLocation();
@@ -154,7 +124,31 @@ const AppContent = memo(() => {
 
   // Memoize route elements to prevent recreation
   const routeElements = useMemo(() => 
-    routes.map(route => <RouteRenderer key={route.path} route={route} />),
+    routes.map(route => {
+      const { path, element: Component, protected: isProtected } = route;
+      
+      const element = isProtected ? (
+        <ProtectedRoute>
+          <Component />
+        </ProtectedRoute>
+      ) : (
+        <Component />
+      );
+      
+      return (
+        <Route
+          key={path}
+          path={path}
+          element={
+            <ErrorBoundary>
+              <Suspense fallback={<PageLoader />}>
+                {element}
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+      );
+    }),
     []
   );
 
