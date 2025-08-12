@@ -65,43 +65,43 @@ export const useMangaDetail = (mangaId: string): UseMangaDetailResult => {
         logger.debug('❌ Consolidated manga detail error:', error);
         throw new Error(error.message || 'Failed to fetch manga details');
       }
-      const payload = (data && 'data' in (data as any)) ? (data as any).data : data;
-      if (!payload?.content) {
+      const payload = data?.data || data;
+      if (!payload) {
         logger.debug('⚠️ No manga found for ID:', mangaId);
         throw new Error('Manga not found');
       }
       // Transform the data to match the expected interface
       const transformedData: MangaDetail = {
         // Title fields
-        id: payload.content.id,
-        anilist_id: payload.content.anilist_id,
-        title: payload.content.title,
-        title_english: payload.content.title_english,
-        title_japanese: payload.content.title_japanese,
-        synopsis: payload.content.synopsis || '',
-        image_url: payload.content.image_url || '',
-        score: payload.content.score,
-        anilist_score: payload.content.anilist_score,
-        rank: payload.content.rank,
-        popularity: payload.content.popularity,
-        year: payload.content.year,
-        color_theme: payload.content.color_theme,
+        id: payload.id,
+        anilist_id: payload.anilist_id,
+        title: payload.title,
+        title_english: payload.title_english,
+        title_japanese: payload.title_japanese,
+        synopsis: payload.synopsis || '',
+        image_url: payload.image_url || '',
+        score: payload.score,
+        anilist_score: payload.anilist_score,
+        rank: payload.rank,
+        popularity: payload.popularity,
+        year: payload.year,
+        color_theme: payload.color_theme,
         num_users_voted: 0,
-        created_at: payload.content.created_at,
-        updated_at: payload.content.updated_at,
+        created_at: payload.created_at,
+        updated_at: payload.updated_at,
         // Manga detail fields (from manga_details join)
-        chapters: payload.content.manga_details?.[0]?.chapters,
-        volumes: payload.content.manga_details?.[0]?.volumes,
-        published_from: payload.content.manga_details?.[0]?.published_from,
-        published_to: payload.content.manga_details?.[0]?.published_to,
-        status: payload.content.manga_details?.[0]?.status || 'Unknown',
-        type: payload.content.manga_details?.[0]?.type || 'Manga',
-        next_chapter_date: payload.content.manga_details?.[0]?.next_chapter_date,
-        next_chapter_number: payload.content.manga_details?.[0]?.next_chapter_number,
-        last_sync_check: payload.content.manga_details?.[0]?.last_sync_check,
+        chapters: payload.manga_details?.[0]?.chapters,
+        volumes: payload.manga_details?.[0]?.volumes,
+        published_from: payload.manga_details?.[0]?.published_from,
+        published_to: payload.manga_details?.[0]?.published_to,
+        status: payload.manga_details?.[0]?.status || 'Unknown',
+        type: payload.manga_details?.[0]?.type || 'Manga',
+        next_chapter_date: payload.manga_details?.[0]?.next_chapter_date,
+        next_chapter_number: payload.manga_details?.[0]?.next_chapter_number,
+        last_sync_check: payload.manga_details?.[0]?.last_sync_check,
         // Extract genres and authors
-        genres: payload.content.title_genres?.map((tg: any) => tg.genres).filter(Boolean) || [],
-        authors: payload.content.title_authors?.map((ta: any) => ta.authors).filter(Boolean) || [],
+        genres: payload.title_genres?.map((tg: any) => tg.genres).filter(Boolean) || [],
+        authors: payload.title_authors?.map((ta: any) => ta.authors).filter(Boolean) || [],
         // Add consolidated data from edge function
         recommendations: payload.recommendations || [],
         streaming_availability: null,

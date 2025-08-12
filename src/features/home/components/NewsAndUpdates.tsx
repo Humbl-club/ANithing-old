@@ -1,5 +1,6 @@
 import React, { memo, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { LazyImage } from '@/components/ui/lazy-image';
 import { 
   Newspaper, 
   ExternalLink, 
@@ -259,8 +260,8 @@ const FeaturedNewsCard = memo(({ news, formatDate, getCategoryColor }: NewsCardP
     <div className="md:flex">
       <div className="md:w-2/5">
         <div className="aspect-video md:aspect-square md:h-full">
-          <img 
-            src={news.imageUrl} 
+          <LazyImage
+            src={news.imageUrl || ''}
             alt={news.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
