@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, Loader2, X, Clock, Sparkles, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
+import { useSearch } from '../hooks/useSearch';
 import { AnimatePresence, motion } from 'framer-motion';
 interface UnifiedSearchBarProps {
   placeholder?: string;
@@ -34,13 +35,18 @@ export const UnifiedSearchBar = ({
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { 
-    query, 
-    results, 
-    isLoading, 
-    search, 
+    results,
+    searchQuery,
+    setSearchQuery,
     clearSearch,
-    hasResults 
-  } = useUnifiedSearch({ contentType, limit: showDropdown ? 5 : 20 });
+    refetch
+  } = useSearch({ 
+    contentType: contentType === 'all' ? 'both' : contentType, 
+    limit: showDropdown ? 5 : 20 
+  });
+  
+  const isLoading = results.isSearching;
+  const hasResults = results.items.length > 0;
   const { searchHistory, clearHistory } = useSearchHistory();
   // Memoize popular searches
   const popularSearches = useMemo(() => [
