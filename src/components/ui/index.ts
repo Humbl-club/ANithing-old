@@ -44,3 +44,9 @@ export * from "./toaster";
 export * from "./toggle";
 export * from "./toggle-group";
 export * from "./tooltip";
+
+// New enhanced UI components
+export * from "./glass-card";
+export * from "./gradient-button";
+export * from "./animated-card";
+export * from "./LoadingSpinner";
