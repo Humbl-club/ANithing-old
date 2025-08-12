@@ -48,13 +48,23 @@ Deno.serve(async (req) => {
           title_authors(authors(*))
         `
 
-    // Fetch main content details
-    const { data: content, error: contentError } = await supabase
+    // Fetch main content details - handle both UUID and AniList ID formats
+    let query = supabase
       .from('titles')
       .select(selectFields)
-      .eq('id', contentId)
       .eq('content_type', contentType)
-      .single()
+
+    // Check if contentId looks like a UUID (contains hyphens) or is numeric (AniList ID)
+    const isUuid = typeof contentId === 'string' && contentId.includes('-')
+    
+    if (isUuid) {
+      query = query.eq('id', contentId)
+    } else {
+      // Assume it's an AniList ID (numeric)
+      query = query.eq('anilist_id', parseInt(contentId))
+    }
+
+    const { data: content, error: contentError } = await query.single()
 
     if (contentError) {
       throw new Error(`Failed to fetch content: ${contentError.message}`)
