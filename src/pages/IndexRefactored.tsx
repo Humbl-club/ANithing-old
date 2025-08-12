@@ -1,6 +1,7 @@
-import { Suspense, memo, useCallback } from "react";
+import { Suspense, memo, useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
 // Layout components
 import { Navigation } from "@/layouts/components/Navigation";
 import { LegalFooter } from "@/layouts/components/LegalFooter";
@@ -155,6 +156,43 @@ const IndexRefactored = memo(() => {
       {/* Scroll to Top Button */}
       <ScrollToTopButton />
     </div>
+  );
+});
+
+// Scroll to Top Button Component
+const ScrollToTopButton = memo(() => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const toggleVisibility = () => {
+      if (window.pageYOffset > 300) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener('scroll', toggleVisibility);
+    return () => window.removeEventListener('scroll', toggleVisibility);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  if (!isVisible) return null;
+
+  return (
+    <Button
+      onClick={scrollToTop}
+      className="fixed bottom-6 right-6 z-50 p-3 glass-button hover:bg-primary/20 transition-all duration-300 animate-fade-in"
+      size="sm"
+    >
+      <ChevronUp className="w-5 h-5" />
+    </Button>
   );
 });
 export default IndexRefactored;
