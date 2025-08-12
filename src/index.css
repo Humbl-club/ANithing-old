@@ -320,6 +320,23 @@
     background-clip: text;
   }
 
+  /* ANITHING Brand Text Gradient */
+  .text-gradient-anithing {
+    background: var(--gradient-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% 100%;
+    animation: gradient-shift 8s ease-in-out infinite;
+  }
+
+  .text-gradient-pink {
+    background: linear-gradient(90deg, #ff006e 0%, #ff4081 50%, #ff79b0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
   /* Enhanced Glass Effects */
   .glow-card-hover {
     box-shadow: 

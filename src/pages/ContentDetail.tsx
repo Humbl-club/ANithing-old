@@ -1,303 +1,198 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useContentDetail } from '@/hooks/useContentDetail';
 import { BaseContent, AnimeContent, MangaContent } from '@/types/content.types';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Star, Heart, Plus, Share2 } from 'lucide-react';
-import { AddToListButton } from '@/shared/components/AddToListButton';
-import { ContentList } from '@/components/generic/ContentList';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { ArrowLeft, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import {
+  HeroSection,
+  InfoTabs,
+  RelatedContent,
+  StreamingProviders,
+  SocialSection
+} from '@/features/details/components';
 
 interface ContentDetailProps {
   contentType: 'anime' | 'manga';
 }
 
 /**
- * Generic content detail page - replaces AnimeDetail and MangaDetail pages
- * Saves ~600 lines of duplicate code
+ * Comprehensive content detail page with modern UI and enhanced features
+ * Features: Hero section with parallax, detailed tabs, streaming info, social features
 */
 export function ContentDetail({ contentType }: ContentDetailProps) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: content, loading, error } = useContentDetail(id!, contentType);
+  const [trailerOpen, setTrailerOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('info');
 
-  // Fetch related content
-  const { data: related } = useQuery({
-    queryKey: ['related', contentType, id],
-    queryFn: async () => {
-      if (!content) return [];
-      
-      const genreIds = content.title_genres?.map((tg: any) => tg.genre_id) || [];
-      if (genreIds.length === 0) return [];
+  // Mock trailer URL - replace with real data from AniList API
+  const trailerUrl = 'https://www.youtube.com/embed/dQw4w9WgXcQ';
 
-      const { data } = await supabase
-        .from('titles')
-        .select('*')
-        .eq('content_type', contentType)
-        .contains('genre_ids', genreIds)
-        .neq('id', id)
-        .limit(8);
-      
-      return data || [];
-    },
-    enabled: !!content
-  });
-
+  // Enhanced loading state
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  if (error || !content) {
-    return (
-      <div className="container py-8">
-        <Button onClick={() => navigate(-1)} variant="ghost">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-        <div className="text-center py-16">
-          <p className="text-muted-foreground">Content not found</p>
-        </div>
-      </div>
-    );
-  }
-
-  const isAnime = contentType === 'anime';
-  const details = isAnime 
-    ? (content as AnimeContent).anime_details 
-    : (content as MangaContent).manga_details;
-
-  return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <div 
-        className="relative h-[400px] bg-cover bg-center"
-        style={{ 
-          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.9)), url(${content.banner_image || content.cover_image})` 
-        }}
-      >
-        <div className="container relative h-full flex items-end pb-8">
-          <Button 
-            onClick={() => navigate(-1)} 
-            variant="ghost" 
-            className="absolute top-4 left-4 text-white"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-
-          <div className="flex gap-6">
-            <img 
-              src={content.cover_image || '/placeholder.svg'} 
-              alt={content.title}
-              className="w-48 h-72 object-cover rounded-lg shadow-xl"
-            />
-            <div className="flex-1 text-white">
-              <h1 className="text-4xl font-bold mb-2">{content.title}</h1>
-              {content.title_english && (
-                <p className="text-xl text-gray-300 mb-4">{content.title_english}</p>
-              )}
-              
-              <div className="flex items-center gap-4 mb-4">
-                {content.score && (
-                  <div className="flex items-center gap-1">
-                    <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                    <span className="font-semibold">{content.score.toFixed(1)}</span>
+      <div className="min-h-screen">
+        {/* Hero skeleton */}
+        <div className="relative h-screen min-h-[600px] overflow-hidden">
+          <Skeleton className="w-full h-full" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
+          <div className="absolute bottom-16 left-0 right-0">
+            <div className="container">
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-end">
+                <div className="lg:col-span-1 flex justify-center lg:justify-start">
+                  <Skeleton className="w-64 h-96 rounded-xl" />
+                </div>
+                <div className="lg:col-span-4 space-y-4">
+                  <Skeleton className="h-16 w-3/4" />
+                  <Skeleton className="h-8 w-1/2" />
+                  <div className="flex gap-4">
+                    <Skeleton className="h-10 w-32" />
+                    <Skeleton className="h-10 w-32" />
                   </div>
-                )}
-                <Badge variant="secondary">{content.status}</Badge>
-                <Badge variant="secondary">
-                  {isAnime ? 'Anime' : 'Manga'}
-                </Badge>
+                </div>
               </div>
-
-              <div className="flex gap-2">
-                <AddToListButton 
-                  contentId={content.id} 
-                  contentType={contentType}
-                  contentTitle={content.title}
-                />
-                <Button variant="secondary" size="icon">
-                  <Heart className="w-4 h-4" />
-                </Button>
-                <Button variant="secondary" size="icon">
-                  <Share2 className="w-4 h-4" />
-                </Button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Content skeleton */}
+        <div className="container py-12">
+          <div className="space-y-8">
+            <Skeleton className="h-12 w-full" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-6">
+                {Array.from({ length: 3 }, (_, i) => (
+                  <Skeleton key={i} className="h-32 w-full" />
+                ))}
+              </div>
+              <div className="space-y-4">
+                {Array.from({ length: 2 }, (_, i) => (
+                  <Skeleton key={i} className="h-64 w-full" />
+                ))}
               </div>
             </div>
           </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Content Section */}
-      <div className="container py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList>
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="characters">Characters</TabsTrigger>
-                <TabsTrigger value="reviews">Reviews</TabsTrigger>
-                <TabsTrigger value="related">Related</TabsTrigger>
-              </TabsList>
+  // Enhanced error state
+  if (error || !content) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="container max-w-md">
+          <Alert className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {error ? 'Failed to load content details.' : 'Content not found.'}
+            </AlertDescription>
+          </Alert>
+          <div className="text-center space-y-4">
+            <h1 className="text-2xl font-bold">Oops! Something went wrong</h1>
+            <p className="text-muted-foreground">
+              We couldn't find the {contentType} you're looking for. It might have been removed or the link might be broken.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Button onClick={() => navigate(-1)} variant="outline">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Go Back
+              </Button>
+              <Button onClick={() => navigate(`/${contentType}`)}>
+                Browse {contentType === 'anime' ? 'Anime' : 'Manga'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-              <TabsContent value="overview" className="space-y-6">
-                <div>
-                  <h2 className="text-2xl font-semibold mb-3">Synopsis</h2>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {content.description || 'No description available.'}
-                  </p>
-                </div>
+  const handleEpisodeClick = (episode: number) => {
+    console.log(`Clicked episode ${episode}`);
+    // Add logic to navigate to episode or handle episode selection
+  };
 
-                <div>
-                  <h3 className="text-xl font-semibold mb-3">Genres</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {content.title_genres?.map((tg: any) => (
-                      <Badge key={tg.genre_id} variant="outline">
-                        {tg.genres?.name}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Hero Section with Parallax */}
+      <HeroSection 
+        content={content} 
+        contentType={contentType} 
+        onWatchTrailer={() => setTrailerOpen(true)}
+      />
 
-                {isAnime && (content as AnimeContent).title_studios && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3">Studios</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {(content as AnimeContent).title_studios?.map((ts: any) => (
-                        <Badge key={ts.studio_id} variant="outline">
-                          {ts.studios?.name}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
+      {/* Main Content */}
+      <div className="container py-16">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-12">
+          
+          {/* Primary Content Area */}
+          <div className="xl:col-span-3 space-y-16">
+            
+            {/* Info Tabs */}
+            <section>
+              <InfoTabs 
+                content={content} 
+                contentType={contentType}
+                onEpisodeClick={handleEpisodeClick}
+              />
+            </section>
 
-                {!isAnime && (content as MangaContent).title_authors && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3">Authors</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {(content as MangaContent).title_authors?.map((ta: any) => (
-                        <Badge key={ta.author_id} variant="outline">
-                          {ta.authors?.name} ({ta.role})
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </TabsContent>
+            {/* Related Content */}
+            <section>
+              <RelatedContent 
+                content={content} 
+                contentType={contentType}
+              />
+            </section>
 
-              <TabsContent value="characters">
-                <p className="text-muted-foreground">Character information coming soon...</p>
-              </TabsContent>
-
-              <TabsContent value="reviews">
-                <p className="text-muted-foreground">Reviews coming soon...</p>
-              </TabsContent>
-
-              <TabsContent value="related">
-                {related && related.length > 0 ? (
-                  <ContentList 
-                    items={related}
-                    columns={4}
-                    onItemClick={(item) => navigate(`/${contentType}/${item.id}`)}
-                  />
-                ) : (
-                  <p className="text-muted-foreground">No related content found.</p>
-                )}
-              </TabsContent>
-            </Tabs>
+            {/* Social Section */}
+            <section>
+              <SocialSection 
+                content={content} 
+                contentType={contentType}
+              />
+            </section>
+            
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
-            <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-              <h3 className="font-semibold">Information</h3>
-              
-              {isAnime ? (
-                <>
-                  {details?.episodes && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Episodes</span>
-                      <span>{details.episodes}</span>
-                    </div>
-                  )}
-                  {details?.duration && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Duration</span>
-                      <span>{details.duration} min</span>
-                    </div>
-                  )}
-                  {details?.season && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Season</span>
-                      <span>{details.season} {details.season_year}</span>
-                    </div>
-                  )}
-                  {details?.format && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Format</span>
-                      <span>{details.format}</span>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  {details?.chapters && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Chapters</span>
-                      <span>{details.chapters}</span>
-                    </div>
-                  )}
-                  {details?.volumes && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Volumes</span>
-                      <span>{details.volumes}</span>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {content.popularity && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Popularity</span>
-                  <span>#{content.popularity.toLocaleString()}</span>
-                </div>
-              )}
-
-              {content.favorites && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Favorites</span>
-                  <span>{content.favorites.toLocaleString()}</span>
-                </div>
-              )}
-            </div>
-
-            <div className="bg-muted/50 rounded-lg p-4">
-              <h3 className="font-semibold mb-3">Actions</h3>
-              <div className="space-y-2">
-                <Button className="w-full" variant="outline">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add to List
-                </Button>
-                <Button className="w-full" variant="outline">
-                  Write Review
-                </Button>
-                <Button className="w-full" variant="outline">
-                  Share
-                </Button>
-              </div>
-            </div>
+          <div className="xl:col-span-1 space-y-8">
+            
+            {/* Streaming Providers */}
+            <section className="sticky top-8">
+              <StreamingProviders 
+                content={content} 
+                contentType={contentType}
+              />
+            </section>
+            
           </div>
         </div>
       </div>
+
+      {/* Trailer Modal */}
+      <Dialog open={trailerOpen} onOpenChange={setTrailerOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Trailer - {content.title}</DialogTitle>
+          </DialogHeader>
+          <div className="aspect-video">
+            <iframe 
+              src={trailerUrl}
+              className="w-full h-full rounded-lg"
+              allowFullScreen
+              title={`${content.title} Trailer`}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

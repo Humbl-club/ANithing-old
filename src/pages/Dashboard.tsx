@@ -1,33 +1,42 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Navigation } from "@/layouts/components/Navigation";
 import { EmailVerificationBanner } from "@/features/user/components/EmailVerificationBanner";
 import { useSimpleGameification } from "@/hooks/useSimpleGameification";
-import { User, BookOpen, Heart, TrendingUp, Crown, Star } from "lucide-react";
+import { useDashboardData } from "@/features/dashboard/hooks/useDashboardData";
+import { UserStats } from "@/features/dashboard/components/UserStats";
+import { ActivityFeed } from "@/features/dashboard/components/ActivityFeed";
+import { QuickActions } from "@/features/dashboard/components/QuickActions";
+import { 
+  User, 
+  BookOpen, 
+  Heart, 
+  TrendingUp, 
+  Crown, 
+  Star,
+  RefreshCw,
+  Sparkles,
+  Calendar,
+  BarChart3,
+  Users,
+  Settings
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 // Lazy load heavy components
 const RecommendedForYou = React.lazy(() => import("@/features/home/components/RecommendedForYou").then(module => ({ default: module.RecommendedForYou })));
 const BecauseYouWatched = React.lazy(() => import("@/features/home/components/BecauseYouWatched").then(module => ({ default: module.BecauseYouWatched })));
-const ActivityFeed = React.lazy(() => import("@/features/user/components/ActivityFeed").then(module => ({ default: module.ActivityFeed })));
 const AdvancedMLRecommendations = React.lazy(() => import("@/shared/components/AdvancedMLRecommendations").then(module => ({ default: module.AdvancedMLRecommendations })));
+
 const Dashboard = React.memo(() => {
   const { user } = useAuth();
-  const { stats, loading } = useSimpleGameification();
-  
-  // Memoize loading component
-  const loadingComponent = useMemo(() => (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/5">
-      <Navigation />
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading your dashboard...</p>
-        </div>
-      </div>
-    </div>
-  ), []);
+  const { stats: gamificationStats, loading: gamificationLoading } = useSimpleGameification();
+  const { stats, activities, isLoading, error, refresh } = useDashboardData();
+  const [refreshing, setRefreshing] = useState(false);
 
   // Memoize tier color calculation
   const getTierColor = useCallback((tier?: string) => {
@@ -40,25 +49,61 @@ const Dashboard = React.memo(() => {
       default: return 'text-muted-foreground border-border/20';
     }
   }, []);
-  // Memoize tier emoji calculation
-  const getTierEmoji = useCallback((tier?: string) => {
-    switch (tier) {
-      case 'GOD': return '👑';
-      case 'LEGENDARY': return '⭐';
-      case 'EPIC': return '🔥';
-      case 'RARE': return '💎';
-      case 'UNCOMMON': return '✨';
-      default: return '🌟';
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refresh();
+      toast.success('Dashboard refreshed!');
+    } catch (err) {
+      toast.error('Failed to refresh dashboard');
+    } finally {
+      setRefreshing(false);
     }
+  }, [refresh]);
+
+  const handleAddContent = useCallback(() => {
+    // TODO: Open add content modal
+    toast.info('Add content feature coming soon!');
   }, []);
 
-  if (loading) {
+  const handleSearch = useCallback(() => {
+    // TODO: Open advanced search modal
+    toast.info('Advanced search feature coming soon!');
+  }, []);
+
+  const handleImportList = useCallback(() => {
+    // TODO: Open import list modal
+    toast.info('Import list feature coming soon!');
+  }, []);
+
+  const handleExportList = useCallback(() => {
+    // TODO: Export user list
+    toast.info('Export list feature coming soon!');
+  }, []);
+
+  // Memoized loading component
+  const loadingComponent = useMemo(() => (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/5">
+      <Navigation />
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading your dashboard...</p>
+        </div>
+      </div>
+    </div>
+  ), []);
+
+  if (isLoading && !stats) {
     return loadingComponent;
   }
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/5">
       <Navigation />
       <EmailVerificationBanner />
+      
       {/* Header */}
       <div className="relative pt-24 pb-12 mb-8">
         <div className="absolute inset-0 bg-gradient-hero"></div>
@@ -67,163 +112,159 @@ const Dashboard = React.memo(() => {
             <div className="text-center">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <Crown className="w-8 h-8 text-yellow-500" />
-                 <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gradient-primary">
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gradient-primary">
                   Welcome back, <span className={cn(
-                    `username-${stats?.usernameTier?.toLowerCase() || 'common'}`
+                    `username-${gamificationStats?.usernameTier?.toLowerCase() || 'common'}`
                   )}>
-                    {stats?.currentUsername || 'User'}
+                    {gamificationStats?.currentUsername || user?.email?.split('@')[0] || 'User'}
                   </span>
                 </h1>
-                {stats?.usernameTier && (
-                  <div className="mt-4 flex items-center justify-center gap-2">
-                    <span className="text-sm text-muted-foreground">Username Tier:</span>
-                    <span className={cn(
-                      "text-lg font-bold capitalize",
-                      `username-${stats.usernameTier.toLowerCase()}`
-                    )}>
-                      {stats.usernameTier.toLowerCase()}
-                    </span>
-                  </div>
-                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  className="ml-4"
+                >
+                  <RefreshCw className={cn("w-4 h-4", { "animate-spin": refreshing })} />
+                </Button>
               </div>
-              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              
+              {gamificationStats?.usernameTier && (
+                <div className="mt-4 flex items-center justify-center gap-2">
+                  <span className="text-sm text-muted-foreground">Username Tier:</span>
+                  <Badge className={cn(
+                    "text-lg font-bold capitalize",
+                    getTierColor(gamificationStats.usernameTier)
+                  )}>
+                    <Sparkles className="w-4 h-4 mr-1" />
+                    {gamificationStats.usernameTier.toLowerCase()}
+                  </Badge>
+                </div>
+              )}
+              
+              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mt-4">
                 Your personalized anime and manga hub with <span className="text-gradient-primary font-semibold">Anithing</span>.
               </p>
             </div>
           </div>
         </div>
       </div>
-      <div className="container mx-auto mobile-safe-padding py-6 md:py-8">
-        {/* Dashboard Stats */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Profile Overview */}
-          <div className="relative group">
-            <div className="anime-card glow-card">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                  <User className="w-6 h-6 text-blue-500" />
+
+      <div className="container mx-auto mobile-safe-padding py-6 md:py-8 space-y-8">
+        {/* Error State */}
+        {error && (
+          <Card className="border-destructive/20 bg-destructive/5">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-destructive/20 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-destructive" />
                 </div>
-                <h3 className="font-bold text-foreground">Profile</h3>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Signed in as</p>
-                <p className="font-semibold text-foreground truncate text-sm">{user?.email}</p>
-              </div>
-            </div>
-          </div>
-          {/* Lists Count */}
-          <div className="relative group">
-            <div className="anime-card glow-card">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 bg-green-500/10 rounded-xl border border-green-500/20">
-                  <BookOpen className="w-6 h-6 text-green-500" />
+                <div>
+                  <h3 className="font-semibold text-destructive">Dashboard Error</h3>
+                  <p className="text-sm text-muted-foreground">{error}</p>
                 </div>
-                <h3 className="font-bold text-foreground">My Lists</h3>
+                <Button variant="outline" size="sm" onClick={handleRefresh} className="ml-auto">
+                  Try Again
+                </Button>
               </div>
-              <div className="space-y-2">
-                <p className="text-3xl font-bold text-gradient-primary">-</p>
-                <p className="text-sm text-muted-foreground">Titles tracked</p>
-              </div>
-            </div>
-          </div>
-          {/* Favorites */}
-          <div className="relative group">
-            <div className="anime-card glow-card">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20">
-                  <Heart className="w-6 h-6 text-red-500" />
-                </div>
-                <h3 className="font-bold text-foreground">Favorites</h3>
-              </div>
-              <div className="space-y-2">
-                <p className="text-3xl font-bold text-gradient-primary">-</p>
-                <p className="text-sm text-muted-foreground">Loved series</p>
-              </div>
-            </div>
-          </div>
-          {/* Activity */}
-          <div className="relative group">
-            <div className="anime-card glow-card">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 bg-purple-500/10 rounded-xl border border-purple-500/20">
-                  <TrendingUp className="w-6 h-6 text-purple-500" />
-                </div>
-                <h3 className="font-bold text-foreground">Activity</h3>
-              </div>
-              <div className="space-y-2">
-                <p className="text-3xl font-bold text-gradient-primary">-</p>
-                <p className="text-sm text-muted-foreground">Recent updates</p>
-              </div>
-            </div>
-          </div>
-        </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Quick Actions */}
-        <div className="anime-card glow-card mb-8">
-          <div className="mb-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gradient-primary mb-3">Explore Your World</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Discover new anime and manga, or manage your personal collection
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <a 
-              href="/anime" 
-              className="relative group spring-bounce"
-            >
-              <div className="anime-card hover-scale text-center">
-                <div className="mb-4">
-                  <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto group-hover:shadow-glow-primary transition-all duration-300">
-                    <BookOpen className="w-8 h-8 text-primary-foreground" />
+        <QuickActions
+          onAddContent={handleAddContent}
+          onSearch={handleSearch}
+          onImportList={handleImportList}
+          onExportList={handleExportList}
+          recentlyWatchingCount={stats?.currentlyWatching}
+          planToWatchCount={stats?.planToWatch}
+        />
+
+        {/* User Statistics */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="w-5 h-5" />
+              Your Statistics
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <UserStats data={stats} isLoading={isLoading} />
+          </CardContent>
+        </Card>
+
+        {/* Two Column Layout for Activities and Recommendations */}
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Activity Feed */}
+          <ActivityFeed
+            activities={activities}
+            isLoading={isLoading}
+            userId={user?.id}
+            limit={10}
+          />
+
+          {/* Quick Stats Overview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                This Week
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                    <p className="text-2xl font-bold text-blue-600">{stats?.weeklyProgress || 0}</p>
+                    <p className="text-sm text-blue-600">Episodes watched</p>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
+                    <p className="text-2xl font-bold text-green-600">{stats?.streak || 0}</p>
+                    <p className="text-sm text-green-600">Day streak</p>
                   </div>
                 </div>
-                <h3 className="font-bold text-foreground mb-2 text-lg">Browse Anime</h3>
-                <p className="text-muted-foreground">Discover new series</p>
-              </div>
-            </a>
-            <a 
-              href="/manga" 
-              className="relative group spring-bounce"
-            >
-              <div className="anime-card hover-scale text-center">
-                <div className="mb-4">
-                  <div className="w-16 h-16 bg-gradient-secondary rounded-2xl flex items-center justify-center mx-auto group-hover:shadow-glow-accent transition-all duration-300">
-                    <Star className="w-8 h-8 text-primary-foreground" />
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Weekly Goal Progress</span>
+                    <span>{stats?.weeklyProgress || 0} / {stats?.weeklyGoal || 5}</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div 
+                      className="bg-primary h-2 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: `${Math.min(100, ((stats?.weeklyProgress || 0) / (stats?.weeklyGoal || 5)) * 100)}%` 
+                      }}
+                    />
                   </div>
                 </div>
-                <h3 className="font-bold text-foreground mb-2 text-lg">Browse Manga</h3>
-                <p className="text-muted-foreground">Find great reads</p>
-              </div>
-            </a>
-            <a 
-              href="/my-lists" 
-              className="relative group spring-bounce"
-            >
-              <div className="anime-card hover-scale text-center">
-                <div className="mb-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto group-hover:shadow-[0_0_30px_rgba(239,68,68,0.4)] transition-all duration-300">
-                    <Heart className="w-8 h-8 text-white" />
+
+                {/* Social Stats */}
+                <div className="pt-4 border-t">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      Social
+                    </h4>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                      <p className="text-lg font-semibold">{stats?.followers || 0}</p>
+                      <p className="text-xs text-muted-foreground">Followers</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold">{stats?.following || 0}</p>
+                      <p className="text-xs text-muted-foreground">Following</p>
+                    </div>
                   </div>
                 </div>
-                <h3 className="font-bold text-foreground mb-2 text-lg">My Lists</h3>
-                <p className="text-muted-foreground">Manage collection</p>
               </div>
-            </a>
-            <a 
-              href="/recommendations" 
-              className="relative group spring-bounce"
-            >
-              <div className="anime-card hover-scale text-center">
-                <div className="mb-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-accent to-orange-500 rounded-2xl flex items-center justify-center mx-auto group-hover:shadow-glow-accent transition-all duration-300">
-                    <TrendingUp className="w-8 h-8 text-primary-foreground" />
-                  </div>
-                </div>
-                <h3 className="font-bold text-foreground mb-2 text-lg">Recommendations</h3>
-                <p className="text-muted-foreground">Get suggestions</p>
-              </div>
-            </a>
-          </div>
+            </CardContent>
+          </Card>
         </div>
+
         {/* Recommendations Section */}
         <div className="space-y-8">
           <React.Suspense fallback={<div className="h-64 animate-pulse bg-muted/20 rounded-lg" />}>
@@ -235,12 +276,11 @@ const Dashboard = React.memo(() => {
           <React.Suspense fallback={<div className="h-64 animate-pulse bg-muted/20 rounded-lg" />}>
             <BecauseYouWatched limit={5} />
           </React.Suspense>
-          <React.Suspense fallback={<div className="h-32 animate-pulse bg-muted/20 rounded-lg" />}>
-            <ActivityFeed />
-          </React.Suspense>
         </div>
       </div>
     </div>
   );
 });
+
+Dashboard.displayName = 'Dashboard';
 export default Dashboard;

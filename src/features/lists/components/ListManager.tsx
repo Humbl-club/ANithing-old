@@ -1,5 +1,7 @@
-import { useState, useCallback, useMemo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   DndContext, 
   closestCenter, 
@@ -15,17 +17,37 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useUserTitleLists } from '@/hooks/useUserTitleLists';
-import { useBackgroundSync } from '@/hooks/useBackgroundSync';
-import { type UserTitleListEntry, type ListStatus } from '@/types/userLists';
+import { 
+  Download, 
+  Upload, 
+  Plus, 
+  Filter,
+  LayoutGrid,
+  List as ListIcon,
+  BarChart3,
+  Share,
+  Settings
+} from 'lucide-react';
+import { useListManagement } from '../hooks/useListManagement';
+import { type EnhancedUserTitleListEntry, type ListStatus, type ListFilter, type ListSort } from '@/types/userLists';
 import { toast } from 'sonner';
-import { SortableListItem } from './SortableListItem';
+import { ListItem } from './ListItem';
 import { ListFilters } from './ListFilters';
 import { BulkActions } from './BulkActions';
+import { ImportExportDialog } from './ImportExportDialog';
+import { ShareListDialog } from './ShareListDialog';
+import { CustomListDialog } from './CustomListDialog';
+import { ListStatsPanel } from './ListStatsPanel';
 
-interface ListManagerRefactoredProps {
+interface ListManagerProps {
   contentType: 'anime' | 'manga' | 'both';
-  listStatuses: ListStatus[];
+  listStatuses?: ListStatus[];
+  showStats?: boolean;
+  showImportExport?: boolean;
+  showCustomLists?: boolean;
+  showSharing?: boolean;
+  compact?: boolean;
+  initialView?: 'list' | 'grid';
 }
 
 export function ListManagerRefactored({ contentType, listStatuses }: ListManagerRefactoredProps) {
