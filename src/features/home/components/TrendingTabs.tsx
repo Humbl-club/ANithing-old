@@ -1,6 +1,7 @@
 import React, { memo, useState, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { AnimeCard } from '@/shared/components/AnimeCard';
+import { LazyImage } from '@/components/ui/lazy-image';
 import { 
   TrendingUp, 
   Calendar, 
@@ -301,8 +302,8 @@ const TrendingTabs = memo(({ onItemClick }: TrendingTabsProps) => {
                         #{index + 1}
                       </div>
                       <div className="w-16 h-24 rounded-lg overflow-hidden">
-                        <img 
-                          src={item.image_url} 
+                        <LazyImage
+                          src={item.image_url || ''}
                           alt={getDisplayName(item)}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         />

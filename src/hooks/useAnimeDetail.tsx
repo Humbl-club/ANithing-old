@@ -69,56 +69,56 @@ export const useAnimeDetail = (animeId: string): UseAnimeDetailResult => {
       logger.debug(`🚀 Fetching consolidated anime details for: ${animeId}`);
       const { data, error } = await supabase.functions.invoke('get-content-details', {
         body: {
-          content_id: animeId,
-          type: 'anime',
-          user_id: user?.id
+          contentId: animeId,
+          contentType: 'anime',
+          includeRecommendations: true
         }
       });
       if (error) {
         logger.debug('❌ Consolidated anime detail error:', error);
         throw new Error(error.message || 'Failed to fetch anime details');
       }
-      const payload = (data && 'data' in (data as any)) ? (data as any).data : data;
-      if (!payload?.content) {
+      const payload = data?.data || data;
+      if (!payload) {
         logger.debug('⚠️ No anime found for ID:', animeId);
         throw new Error('Anime not found');
       }
       // Transform the data to match the expected interface
       const transformedData: AnimeDetail = {
         // Title fields
-        id: payload.content.id,
-        anilist_id: payload.content.anilist_id,
-        title: payload.content.title,
-        title_english: payload.content.title_english,
-        title_japanese: payload.content.title_japanese,
-        synopsis: payload.content.synopsis || '',
-        image_url: payload.content.image_url || '',
-        score: payload.content.score,
-        anilist_score: payload.content.anilist_score,
-        rank: payload.content.rank,
-        popularity: payload.content.popularity,
-        year: payload.content.year,
-        color_theme: payload.content.color_theme,
+        id: payload.id,
+        anilist_id: payload.anilist_id,
+        title: payload.title,
+        title_english: payload.title_english,
+        title_japanese: payload.title_japanese,
+        synopsis: payload.synopsis || '',
+        image_url: payload.image_url || '',
+        score: payload.score,
+        anilist_score: payload.anilist_score,
+        rank: payload.rank,
+        popularity: payload.popularity,
+        year: payload.year,
+        color_theme: payload.color_theme,
         num_users_voted: 0,
-        created_at: payload.content.created_at,
-        updated_at: payload.content.updated_at,
-        external_links: Array.isArray(payload.content.external_links) ? payload.content.external_links : [],
+        created_at: payload.created_at,
+        updated_at: payload.updated_at,
+        external_links: Array.isArray(payload.external_links) ? payload.external_links : [],
         // Anime detail fields (from anime_details join)
-        episodes: payload.content.anime_details?.[0]?.episodes,
-        aired_from: payload.content.anime_details?.[0]?.aired_from,
-        aired_to: payload.content.anime_details?.[0]?.aired_to,
-        season: payload.content.anime_details?.[0]?.season,
-        status: payload.content.anime_details?.[0]?.status || 'Unknown',
-        type: payload.content.anime_details?.[0]?.type || 'TV',
-        trailer_url: payload.content.anime_details?.[0]?.trailer_url,
-        trailer_site: payload.content.anime_details?.[0]?.trailer_site,
-        trailer_id: payload.content.anime_details?.[0]?.trailer_id,
-        next_episode_date: payload.content.anime_details?.[0]?.next_episode_date,
-        next_episode_number: payload.content.anime_details?.[0]?.next_episode_number,
-        last_sync_check: payload.content.anime_details?.[0]?.last_sync_check,
+        episodes: payload.anime_details?.[0]?.episodes,
+        aired_from: payload.anime_details?.[0]?.aired_from,
+        aired_to: payload.anime_details?.[0]?.aired_to,
+        season: payload.anime_details?.[0]?.season,
+        status: payload.anime_details?.[0]?.status || 'Unknown',
+        type: payload.anime_details?.[0]?.type || 'TV',
+        trailer_url: payload.anime_details?.[0]?.trailer_url,
+        trailer_site: payload.anime_details?.[0]?.trailer_site,
+        trailer_id: payload.anime_details?.[0]?.trailer_id,
+        next_episode_date: payload.anime_details?.[0]?.next_episode_date,
+        next_episode_number: payload.anime_details?.[0]?.next_episode_number,
+        last_sync_check: payload.anime_details?.[0]?.last_sync_check,
         // Extract genres and studios
-        genres: payload.content.title_genres?.map((tg: any) => tg.genres).filter(Boolean) || [],
-        studios: payload.content.title_studios?.map((ts: any) => ts.studios).filter(Boolean) || [],
+        genres: payload.title_genres?.map((tg: any) => tg.genres).filter(Boolean) || [],
+        studios: payload.title_studios?.map((ts: any) => ts.studios).filter(Boolean) || [],
         // Add consolidated data from edge function
         recommendations: payload.recommendations || [],
         streaming_availability: null,
