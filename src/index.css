@@ -551,16 +551,92 @@
     transform: scale(0.96);
   }
 
+  /* Premium Glass Micro-Animations */
+  .glass-interactive {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-interactive:hover {
+    transform: translateY(-2px) scale(1.01);
+    backdrop-filter: blur(24px);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.15),
+      0 0 30px hsl(var(--primary) / 0.15);
+  }
+
+  .glass-interactive:active {
+    transform: translateY(0px) scale(0.99);
+  }
+
+  /* Apple-style Focus States */
+  .glass-focus:focus,
+  .glass-focus:focus-visible {
+    outline: none;
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: 
+      0 0 0 4px hsl(var(--primary) / 0.1),
+      0 8px 32px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  /* Subtle Shimmer Effect */
+  .glass-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass-shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 100%
+    );
+    transition: left 0.6s ease;
+  }
+
+  .glass-shimmer:hover::before {
+    left: 100%;
+  }
+
   /* Responsive Glass Intensity */
   @media (max-width: 768px) {
     .glass-card {
-      background: hsl(220 20% 8% / 0.7);
-      backdrop-filter: blur(12px);
+      background: hsl(220 20% 8% / 0.8);
+      backdrop-filter: blur(16px);
     }
     
     .glass-search {
       background: hsl(220 20% 8% / 0.8);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+    }
+
+    /* Reduce animations on mobile for performance */
+    .glass-interactive:hover {
+      transform: none;
+      backdrop-filter: blur(16px);
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-reduced-motion: reduce) {
+    .glass-interactive,
+    .card-hover-lift,
+    .spring-bounce {
+      transition: none;
+      animation: none;
+    }
+    
+    .glass-shimmer::before {
+      display: none;
     }
   }
 

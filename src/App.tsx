@@ -15,6 +15,7 @@ import { GraphQLProvider } from "@/providers/GraphQLProvider";
 import { useInitializationStore } from '@/store/initializationStore';
 import { useUserInitialization } from '@/hooks/useUserInitialization';
 import { ThemeProvider } from '@/providers/ThemeProvider';
+import { useSettingsEffects } from '@/hooks/useSettingsEffects';
 import { 
   createLazyPage, 
   ComponentPreloader, 
@@ -187,6 +188,8 @@ const InitializationLoader = () => (
 const InitializationWrapper = memo(({ children }: { children: React.ReactNode }) => {
   // Initialize user data - this will update the global initialization state
   useUserInitialization();
+  // Apply settings effects across the app
+  useSettingsEffects();
   return <>{children}</>;
 });
 
