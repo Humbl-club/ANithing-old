@@ -328,8 +328,8 @@ const NewsCard = memo(({ news, formatDate, getCategoryColor, compact }: NewsCard
     compact ? 'flex gap-4 p-4' : 'space-y-4'
   }`}>
     <div className={compact ? 'w-20 h-20 flex-shrink-0' : 'aspect-video'}>
-      <img 
-        src={news.imageUrl} 
+      <LazyImage
+        src={news.imageUrl || ''}
         alt={news.title}
         className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
       />
