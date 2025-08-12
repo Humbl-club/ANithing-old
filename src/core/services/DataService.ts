@@ -53,13 +53,23 @@ export class DataService {
   async getHomeSections() {
     // Try edge function first for cached data
     try {
+      console.log('🔍 Attempting to fetch home data from edge function...');
       const { data, error } = await this.client.functions.invoke('get-home-data', {
         body: {
           sections: ['trending-anime', 'recent-anime', 'trending-manga', 'recent-manga'],
           limit: 20
         }
       });
-      if (!error && data?.success) {
+      
+      if (error) {
+        console.warn('⚠️ Edge function error:', error);
+      } else if (data?.success && data?.data) {
+        console.log('✅ Edge function success, data received:', {
+          trendingAnime: data.data.trendingAnime?.length || 0,
+          recentAnime: data.data.recentAnime?.length || 0,
+          trendingManga: data.data.trendingManga?.length || 0,
+          recentManga: data.data.recentManga?.length || 0
+        });
         return {
           trendingAnime: data.data.trendingAnime || [],
           recentAnime: data.data.recentAnime || [],
@@ -68,10 +78,19 @@ export class DataService {
         };
       }
     } catch (e) {
-      // Edge function failed, falling back to direct query
+      console.warn('⚠️ Edge function exception, falling back to direct query:', e);
     }
+    
     // Fallback to repository method
-    return getHomepageSections(this.client);
+    console.log('📊 Falling back to repository method...');
+    const result = await getHomepageSections(this.client);
+    console.log('✅ Repository method success:', {
+      trendingAnime: result.trendingAnime?.length || 0,
+      recentAnime: result.recentAnime?.length || 0,
+      trendingManga: result.trendingManga?.length || 0,
+      recentManga: result.recentManga?.length || 0
+    });
+    return result;
   }
   /**
 /**
