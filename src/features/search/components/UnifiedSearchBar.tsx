@@ -72,7 +72,7 @@ export const UnifiedSearchBar = ({
   // Input change handler - no need to memoize
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    search(value);
+    setSearchQuery(value);
     setSelectedIndex(-1); // Reset selection on new input
     if (showDropdown) {
       setIsOpen(value.length >= 0); // Show dropdown immediately for history/popular
@@ -104,15 +104,15 @@ export const UnifiedSearchBar = ({
       } else if (selectedIndex >= results.length && selectedIndex < results.length + searchHistory.length) {
         const historyIndex = selectedIndex - results.length;
         const term = searchHistory[historyIndex];
-        search(term);
+        setSearchQuery(term);
         handleSearch(term);
       } else if (selectedIndex >= results.length + searchHistory.length) {
         const popularIndex = selectedIndex - results.length - searchHistory.length;
         const term = popularSearches[popularIndex];
-        search(term);
+        setSearchQuery(term);
         handleSearch(term);
       } else {
-        handleSearch(query);
+        handleSearch(searchQuery);
       }
     } else if (e.key === 'Escape') {
       setIsOpen(false);
@@ -145,7 +145,7 @@ export const UnifiedSearchBar = ({
           ref={inputRef}
           type="search"
           placeholder={placeholder}
-          value={query}
+          value={searchQuery}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           onFocus={() => setIsOpen(true)}
@@ -157,7 +157,7 @@ export const UnifiedSearchBar = ({
         {isLoading && (
           <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin" />
         )}
-        {query && !isLoading && (
+        {searchQuery && !isLoading && (
           <Button
             variant="ghost"
             size="sm"
@@ -190,7 +190,7 @@ export const UnifiedSearchBar = ({
             className="bg-background border rounded-lg shadow-lg overflow-hidden"
           >
             {/* Search Results */}
-            {hasResults && query.length >= 2 && (
+            {hasResults && searchQuery.length >= 2 && (
               <div className="p-2" data-testid="search-results">
                 <div className="text-xs font-medium text-muted-foreground px-2 py-1">
                   Search Results
@@ -226,7 +226,7 @@ export const UnifiedSearchBar = ({
                     variant="ghost"
                     size="sm"
                     className="w-full mt-1"
-                    onClick={() => handleSearch(query)}
+                    onClick={() => handleSearch(searchQuery)}
                   >
                     View all {results.length} results
                   </Button>
@@ -234,14 +234,14 @@ export const UnifiedSearchBar = ({
               </div>
             )}
             {/* Loading State */}
-            {isLoading && query.length >= 2 && (
+            {isLoading && searchQuery.length >= 2 && (
               <div className="p-4 text-center">
                 <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                 <div className="text-sm text-muted-foreground">Searching...</div>
               </div>
             )}
             {/* Recent Searches */}
-            {!hasResults && !isLoading && query.length < 2 && searchHistory.length > 0 && (
+            {!hasResults && !isLoading && searchQuery.length < 2 && searchHistory.length > 0 && (
               <div className="p-2">
                 <div className="flex items-center justify-between px-2 py-1">
                   <div className="text-xs font-medium text-muted-foreground flex items-center gap-1">
@@ -264,7 +264,7 @@ export const UnifiedSearchBar = ({
                       data-testid="search-option"
                       key={index}
                       onClick={() => {
-                        search(term);
+                        setSearchQuery(term);
                         handleSearch(term);
                       }}
                       className={cn(
@@ -279,7 +279,7 @@ export const UnifiedSearchBar = ({
               </div>
             )}
             {/* Popular Searches */}
-            {!hasResults && !isLoading && !query && (
+            {!hasResults && !isLoading && !searchQuery && (
               <div className="p-2">
                 <div className="text-xs font-medium text-muted-foreground px-2 py-1 flex items-center gap-1">
                   <TrendingUp className="w-3 h-3" />
@@ -298,7 +298,7 @@ export const UnifiedSearchBar = ({
                           selectedIndex === actualIndex && "bg-primary text-primary-foreground"
                         )}
                         onClick={() => {
-                          search(term);
+                          setSearchQuery(term);
                           handleSearch(term);
                         }}
                       >
@@ -310,10 +310,10 @@ export const UnifiedSearchBar = ({
               </div>
             )}
             {/* No Results */}
-            {query && query.length >= 2 && !hasResults && !isLoading && (
+            {searchQuery && searchQuery.length >= 2 && !hasResults && !isLoading && (
               <div className="p-4 text-center text-sm text-muted-foreground">
                 <Sparkles className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                No results found for "{query}"
+                No results found for "{searchQuery}"
               </div>
             )}
           </motion.div>,
