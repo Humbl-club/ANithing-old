@@ -149,3 +149,151 @@ export const STATUS_MAPPING = {
     plan_to_read: 'plan_to_read'
   }
 } as const;
+
+// Enhanced types for advanced list management
+export interface CustomListType {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  is_system: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CustomList {
+  id: string;
+  user_id: string;
+  name: string;
+  description?: string;
+  list_type_id?: string;
+  is_public: boolean;
+  is_collaborative: boolean;
+  share_token: string;
+  sort_order: number;
+  view_count: number;
+  like_count: number;
+  created_at: string;
+  updated_at: string;
+  list_type?: CustomListType;
+  items?: CustomListItem[];
+  collaborators?: ListCollaborator[];
+}
+
+export interface CustomListItem {
+  id: string;
+  list_id: string;
+  title_id: string;
+  sort_order: number;
+  notes?: string;
+  personal_rating?: number;
+  date_added: string;
+  added_by_user_id?: string;
+  is_pinned: boolean;
+  tags: string[];
+  title?: any;
+}
+
+export interface ListCollaborator {
+  id: string;
+  list_id: string;
+  user_id: string;
+  permission_level: 'owner' | 'editor' | 'viewer';
+  invited_by?: string;
+  invited_at: string;
+  accepted_at?: string;
+}
+
+export interface ListLike {
+  id: string;
+  list_id: string;
+  user_id: string;
+  created_at: string;
+}
+
+export interface ListImport {
+  id: string;
+  user_id: string;
+  source_type: 'myanimelist' | 'anilist' | 'kitsu' | 'csv' | 'json';
+  import_status: 'pending' | 'processing' | 'completed' | 'failed';
+  total_items: number;
+  processed_items: number;
+  success_count: number;
+  error_count: number;
+  import_data?: any;
+  error_log?: any;
+  created_at: string;
+  completed_at?: string;
+}
+
+export interface ListImportData {
+  source_type: 'myanimelist' | 'anilist' | 'kitsu' | 'csv' | 'json';
+  data: any;
+  options?: {
+    merge_duplicates?: boolean;
+    update_existing?: boolean;
+    import_ratings?: boolean;
+    import_progress?: boolean;
+    import_dates?: boolean;
+  };
+}
+
+export interface ListExportData {
+  format: 'json' | 'csv';
+  data: any;
+  metadata: {
+    exported_at: string;
+    total_items: number;
+    content_type: 'anime' | 'manga' | 'both';
+  };
+}
+
+export interface BulkListOperation {
+  ids: string[];
+  updates: Partial<UserTitleListEntry>;
+}
+
+export interface ListStats {
+  total: number;
+  statusCounts: Record<string, number>;
+  averageRating: number;
+  totalHours: number;
+}
+
+export interface ListFilter {
+  status?: string;
+  mediaType?: 'anime' | 'manga' | 'both';
+  rating?: {
+    min?: number;
+    max?: number;
+  };
+  progress?: {
+    min?: number;
+    max?: number;
+  };
+  tags?: string[];
+  dateRange?: {
+    start?: string;
+    end?: string;
+  };
+  search?: string;
+}
+
+export interface ListSort {
+  field: 'title' | 'status' | 'rating' | 'progress' | 'updated_at' | 'created_at' | 'sort_order';
+  direction: 'asc' | 'desc';
+}
+
+// Enhanced user list entry with additional fields
+export interface EnhancedUserTitleListEntry extends UserTitleListEntry {
+  sort_order: number;
+  tags: string[];
+  custom_status?: string;
+  priority: number;
+  visibility: 'public' | 'friends' | 'private';
+  last_activity_at: string;
+  is_pinned?: boolean;
+  personal_notes?: string;
+}

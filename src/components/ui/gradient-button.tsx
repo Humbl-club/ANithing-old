@@ -2,56 +2,54 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
-const buttonVariants = cva(
+
+const gradientButtonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 relative overflow-hidden",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105 hover:shadow-glow-primary",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:scale-105",
-        outline: "border border-border bg-card/50 backdrop-blur-sm text-foreground hover:bg-card hover:border-primary/50 hover:shadow-glow-primary hover:scale-[1.02]",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:scale-105",
-        ghost: "hover:bg-accent hover:text-accent-foreground hover:scale-[1.02]",
-        link: "text-primary underline-offset-4 hover:underline",
-        hero: "bg-gradient-primary text-primary-foreground hover:shadow-glow-primary hover:scale-105 font-semibold",
-        accent: "bg-gradient-secondary text-accent-foreground hover:shadow-glow-accent hover:scale-105 font-semibold",
-        glassmorphism: "bg-card/20 backdrop-blur-md border border-border/30 text-foreground hover:bg-card/40 hover:border-primary/50 hover:scale-[1.02]",
+        primary: "bg-gradient-primary text-primary-foreground hover:shadow-glow-primary hover:scale-105 font-semibold",
+        secondary: "bg-gradient-secondary text-secondary-foreground hover:shadow-glow-accent hover:scale-105 font-semibold",
         pink: "bg-gradient-pink text-white hover:shadow-glow-pink hover:scale-105 font-semibold",
         purple: "bg-gradient-purple text-white hover:shadow-glow-purple hover:scale-105 font-semibold",
         rainbow: "bg-gradient-rainbow text-white hover:shadow-glow-rainbow hover:scale-105 font-semibold",
-        glass: "bg-glass backdrop-blur-lg border border-glass-border text-foreground hover:bg-glass-hover hover:border-primary/40 hover:shadow-glow-primary hover:scale-[1.02]",
-        shimmer: "bg-gradient-primary text-primary-foreground hover:shadow-glow-primary hover:scale-105 font-semibold relative before:absolute before:inset-0 before:bg-shimmer before:bg-[length:200%_100%] hover:before:animate-shimmer"
+        glass: "bg-glass backdrop-blur-lg border border-glass-border text-foreground hover:bg-glass-hover hover:border-primary/40 hover:shadow-glow-primary",
+        outline: "border-2 border-transparent bg-gradient-primary bg-clip-border text-transparent bg-clip-text hover:text-white hover:bg-clip-padding hover:shadow-glow-primary",
+        ghost: "bg-transparent hover:bg-gradient-primary/20 hover:text-primary-foreground backdrop-blur-sm"
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 px-3 text-xs",
-        lg: "h-11 px-8 text-base",
-        xl: "h-12 px-10 text-lg",
-        icon: "h-10 w-10",
+        sm: "h-9 px-4 text-xs",
+        default: "h-11 px-6 py-2",
+        lg: "h-12 px-8 text-base",
+        xl: "h-14 px-10 text-lg",
+        icon: "h-11 w-11"
       },
       animation: {
         none: "",
+        pulse: "animate-pulse-glow",
         bounce: "hover:animate-bounce-subtle",
-        pulse: "hover:animate-pulse-glow",
-        glow: "animate-glow-pulse"
+        gradient: "bg-[length:200%_200%] hover:animate-gradient-shift",
+        shimmer: "relative before:absolute before:inset-0 before:bg-shimmer before:bg-[length:200%_100%] hover:before:animate-shimmer"
       }
     },
     defaultVariants: {
-      variant: "default",
+      variant: "primary",
       size: "default",
       animation: "none"
-    },
+    }
   }
 )
-export interface ButtonProps
+
+export interface GradientButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+    VariantProps<typeof gradientButtonVariants> {
   asChild?: boolean
+  glow?: boolean
   ripple?: boolean
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, animation, asChild = false, ripple, children, ...props }, ref) => {
+const GradientButton = React.forwardRef<HTMLButtonElement, GradientButtonProps>(
+  ({ className, variant, size, animation, asChild = false, glow, ripple, children, ...props }, ref) => {
     const [rippleCoords, setRippleCoords] = React.useState<{ x: number; y: number } | null>(null)
     const [isPressed, setIsPressed] = React.useState(false)
 
@@ -69,9 +67,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }
 
     const Comp = asChild ? Slot : "button"
+    
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, animation }), className)}
+        className={cn(
+          gradientButtonVariants({ variant, size, animation }),
+          glow && "hover:shadow-glow-button-hover",
+          className
+        )}
         ref={ref}
         onClick={handleClick}
         {...props}
@@ -79,7 +82,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {children}
         
         {/* Shine effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full hover:translate-x-full transition-transform duration-700 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
         
         {/* Ripple effect */}
         {ripple && rippleCoords && isPressed && (
@@ -93,11 +96,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             }}
           />
         )}
+        
+        {/* Glow overlay */}
+        {glow && (
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-lg" />
+        )}
       </Comp>
     )
   }
 )
 
-Button.displayName = "Button"
+GradientButton.displayName = "GradientButton"
 
-export { Button, buttonVariants }
+export { GradientButton, gradientButtonVariants }

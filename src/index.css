@@ -16,10 +16,10 @@
     --popover: 220 20% 8%;
     --popover-foreground: 210 40% 98%;
 
-    /* Primary - Electric Blue */
-    --primary: 219 100% 65%;
-    --primary-foreground: 220 26% 6%;
-    --primary-glow: 219 100% 75%;
+    /* Primary - ANITHING Pink */
+    --primary: 328 100% 50%;              /* Primary pink #ff006e */
+    --primary-foreground: 210 40% 98%;    /* White text on pink */
+    --primary-glow: 328 100% 60%;         /* Glow variant */
 
     /* Secondary - Deep Purple */
     --secondary: 270 95% 50%;
@@ -29,30 +29,31 @@
     --muted: 220 15% 15%;
     --muted-foreground: 215 16% 65%;
 
-    /* Accent - Vibrant Orange for "Ani" */
-    --accent: 25 95% 60%;
-    --accent-foreground: 220 26% 6%;
+    /* Accent - Pink Accent */
+    --accent: 340 100% 63%;              /* Secondary pink #ff4081 */
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 220 15% 20%;
     --input: 220 15% 15%;
-    --ring: 219 100% 65%;
+    --ring: 328 100% 50%;                /* Focus rings - pink */
 
     /* Enhanced radius for modern feel */
     --radius: 0.75rem;
 
-    /* Anime-specific design tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(219 100% 65%), hsl(270 95% 50%));
-    --gradient-secondary: linear-gradient(135deg, hsl(270 95% 50%), hsl(315 100% 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(219 100% 65% / 0.1), hsl(270 95% 50% / 0.1));
-    --gradient-card: linear-gradient(135deg, hsl(220 20% 8%), hsl(220 15% 12%));
+    /* ANITHING design tokens */
+    --gradient-primary: linear-gradient(135deg, #ff006e 0%, #ff4081 50%, #ff79b0 100%);
+    --gradient-secondary: linear-gradient(135deg, #a855f7 0%, #c084fc 50%, #e9d5ff 100%);
+    --gradient-hero: linear-gradient(135deg, rgba(255, 0, 110, 0.15) 0%, rgba(255, 64, 129, 0.1) 50%, rgba(168, 85, 247, 0.1) 100%);
+    --gradient-card: linear-gradient(135deg, rgba(30, 30, 46, 0.8) 0%, rgba(22, 33, 62, 0.6) 100%);
     --gradient-pink: linear-gradient(135deg, hsl(329 75% 51%), hsl(315 100% 65%));
     --gradient-purple: linear-gradient(135deg, hsl(270 91% 65%), hsl(280 100% 70%));
     --gradient-rainbow: linear-gradient(135deg, hsl(219 100% 65%), hsl(270 95% 50%), hsl(329 75% 51%));
     --gradient-button: linear-gradient(135deg, hsl(329 75% 51%), hsl(270 95% 50%));
     --gradient-button-hover: linear-gradient(135deg, hsl(329 80% 56%), hsl(270 100% 55%));
+    --gradient-text: linear-gradient(90deg, #ff006e 0%, #ff4081 25%, #ff79b0 50%, #c084fc 75%, #a855f7 100%);
     
     /* Apple Glassmorphism Effects */
     --glass-bg: hsl(220 20% 8% / 0.4);
@@ -74,10 +75,21 @@
     --glow-button: 0 0 20px hsl(329 75% 51% / 0.3);
     --glow-button-hover: 0 0 30px hsl(329 75% 51% / 0.5);
 
-    /* Animation variables */
+    /* ANITHING Animation System */
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-spring: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    /* Animation Durations */
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+    
+    /* Easing Functions */
+    --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
 

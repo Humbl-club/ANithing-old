@@ -70,30 +70,53 @@ export default {
 					focus: 'hsl(var(--glass-focus))'
 				},
 				pink: {
-					50: 'hsl(329 100% 98%)',
-					100: 'hsl(329 100% 95%)',
-					200: 'hsl(329 96% 87%)',
-					300: 'hsl(329 87% 77%)',
-					400: 'hsl(329 86% 65%)',
-					500: 'hsl(329 75% 51%)',
-					600: 'hsl(329 70% 42%)',
-					700: 'hsl(329 69% 33%)',
-					800: 'hsl(329 67% 27%)',
-					900: 'hsl(329 65% 23%)',
-					950: 'hsl(329 80% 14%)'
+					50: '#fdf2f8',
+					100: '#fce7f3',
+					200: '#fbcfe8',
+					300: '#f9a8d4',
+					400: '#f472b6',
+					500: '#ff006e', // Primary ANITHING pink
+					600: '#ec4899',
+					700: '#be185d',
+					800: '#9d174d',
+					900: '#831843',
+					950: '#4c1d3b',
+					accent: '#ff4081', // Secondary pink accent
+					light: '#ff79b0', // Light pink accent
 				},
 				purple: {
-					50: 'hsl(270 100% 98%)',
-					100: 'hsl(269 100% 95%)',
-					200: 'hsl(269 100% 92%)',
-					300: 'hsl(269 97% 85%)',
-					400: 'hsl(270 95% 75%)',
-					500: 'hsl(270 91% 65%)',
-					600: 'hsl(271 81% 56%)',
-					700: 'hsl(272 72% 47%)',
-					800: 'hsl(272 67% 39%)',
-					900: 'hsl(273 66% 32%)',
-					950: 'hsl(274 87% 21%)'
+					50: '#faf5ff',
+					100: '#f3e8ff',
+					200: '#e9d5ff',
+					300: '#d8b4fe',
+					400: '#c084fc',
+					500: '#a855f7',
+					600: '#9333ea',
+					700: '#7c3aed',
+					800: '#6b21a8',
+					900: '#581c87',
+					950: '#3b1065'
+				},
+				// ANITHING Brand Colors
+				brand: {
+					primary: '#0a0a0f', // Deep space navy
+					secondary: '#1a1a2e', // Rich dark purple
+					tertiary: '#16213e', // Deep blue-gray
+					surface: '#1e1e2e', // Card backgrounds
+					overlay: 'rgba(26, 26, 46, 0.95)', // Modal overlays
+				},
+				// Enhanced neutral colors for better contrast
+				neutral: {
+					50: '#f8fafc',
+					100: '#f1f5f9',
+					200: '#e2e8f0',
+					300: '#cbd5e1',
+					400: '#94a3b8',
+					500: '#64748b',
+					600: '#475569',
+					700: '#334155',
+					800: '#1e293b',
+					900: '#0f172a',
 				}
 			},
 			backgroundImage: {
@@ -121,7 +144,22 @@ export default {
 			boxShadow: {
 				'glow-primary': 'var(--glow-primary)',
 				'glow-accent': 'var(--glow-accent)',
-				'glow-card': 'var(--glow-card)'
+				'glow-card': 'var(--glow-card)',
+				// ANITHING Pink Glow Effects
+				'glow-pink-sm': '0 0 10px rgba(255, 0, 110, 0.3)',
+				'glow-pink-md': '0 0 20px rgba(255, 0, 110, 0.4)',
+				'glow-pink-lg': '0 0 30px rgba(255, 0, 110, 0.5)',
+				'glow-pink-xl': '0 0 40px rgba(255, 0, 110, 0.6)',
+				// Purple Glow Effects
+				'glow-purple-sm': '0 0 10px rgba(168, 85, 247, 0.3)',
+				'glow-purple-md': '0 0 20px rgba(168, 85, 247, 0.4)',
+				'glow-purple-lg': '0 0 30px rgba(168, 85, 247, 0.5)',
+				'glow-purple-xl': '0 0 40px rgba(168, 85, 247, 0.6)',
+				// Glass Shadows
+				'glass-sm': '0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.05)',
+				'glass-md': '0 8px 16px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.06)',
+				'glass-lg': '0 16px 32px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08)',
+				'glass-xl': '0 24px 48px rgba(0, 0, 0, 0.15), 0 12px 24px rgba(0, 0, 0, 0.10)',
 			},
 			fontFamily: {
 				sans: ['Inter', 'system-ui', 'sans-serif']
