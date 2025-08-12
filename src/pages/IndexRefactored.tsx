@@ -99,13 +99,22 @@ const IndexRefactored = memo(() => {
   
   // Loading state
   if (isLoading) {
+    console.log('🏠 Home page is loading...');
     return <LoadingScreen />;
   }
   
   // Error state
   if (error) {
+    console.error('🏠 Home page error:', error);
     return <ErrorScreen error={error} />;
   }
+
+  console.log('🏠 Home page data received:', {
+    trendingAnime: sections.trendingAnime?.length || 0,
+    recentAnime: sections.recentAnime?.length || 0,
+    trendingManga: sections.trendingManga?.length || 0,
+    recentManga: sections.recentManga?.length || 0
+  });
 
   // Check if we have any content at all
   const hasAnyContent = sections.trendingAnime.length > 0 || 
