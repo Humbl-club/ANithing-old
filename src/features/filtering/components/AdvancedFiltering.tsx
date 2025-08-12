@@ -190,7 +190,7 @@ export function AdvancedFilteringRefactored({
                     <SelectValue placeholder="Any status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any status</SelectItem>
+                    <SelectItem value="all">Any status</SelectItem>
                     {statuses.map(status => (
                       <SelectItem key={status} value={status}>{status}</SelectItem>
                     ))}
@@ -205,7 +205,7 @@ export function AdvancedFilteringRefactored({
                     <SelectValue placeholder="Any type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any type</SelectItem>
+                    <SelectItem value="all">Any type</SelectItem>
                     {types.map(type => (
                       <SelectItem key={type} value={type}>{type}</SelectItem>
                     ))}

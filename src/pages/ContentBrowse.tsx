@@ -166,7 +166,7 @@ export function ContentBrowse({ contentType }: ContentBrowseProps) {
             <SelectValue placeholder="All Genres" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Genres</SelectItem>
+            <SelectItem value="all">All Genres</SelectItem>
             {genres?.map((g) => (
               <SelectItem key={g.id} value={g.id}>
                 {g.name}
@@ -180,7 +180,7 @@ export function ContentBrowse({ contentType }: ContentBrowseProps) {
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Status</SelectItem>
+            <SelectItem value="all">All Status</SelectItem>
             {statusOptions.map((s) => (
               <SelectItem key={s} value={s}>
                 {s.replace(/_/g, ' ').toLowerCase()}

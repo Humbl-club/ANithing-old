@@ -34,6 +34,7 @@ export function ContentDetail({ contentType }: ContentDetailProps) {
   const { data: content, loading, error } = useContentDetail(id!, contentType);
   const [trailerOpen, setTrailerOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('info');
+  const [isFavorited, setIsFavorited] = useState(false);
 
   // Mock trailer URL - replace with real data from AniList API
   const trailerUrl = 'https://www.youtube.com/embed/dQw4w9WgXcQ';

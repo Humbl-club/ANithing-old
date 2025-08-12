@@ -193,7 +193,7 @@ const MyLists = () => {
                     <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
                   <SelectContent className="z-dropdown">
-                    <SelectItem value="">All Statuses</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
                     {listStatuses
                       .filter(status => status.media_type === activeTab || status.media_type === 'both')
                       .map(status => (

@@ -255,7 +255,7 @@ const Browse = () => {
                       <SelectValue placeholder="Any Genre" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any Genre</SelectItem>
+                      <SelectItem value="all">Any Genre</SelectItem>
                       {genres.map((genre) => (
                         <SelectItem key={genre} value={genre.toLowerCase()}>
                           {genre}
@@ -273,7 +273,7 @@ const Browse = () => {
                       <SelectValue placeholder="Any Tag" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any Tag</SelectItem>
+                      <SelectItem value="all">Any Tag</SelectItem>
                       {tags.map((tag) => (
                         <SelectItem key={tag} value={tag.toLowerCase()}>
                           {tag}
@@ -291,7 +291,7 @@ const Browse = () => {
                       <SelectValue placeholder="Any Status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any Status</SelectItem>
+                      <SelectItem value="all">Any Status</SelectItem>
                       {statuses.map((status) => (
                         <SelectItem key={status} value={status.toLowerCase()}>
                           {status}
@@ -309,7 +309,7 @@ const Browse = () => {
                       <SelectValue placeholder="Any Year" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any Year</SelectItem>
+                      <SelectItem value="all">Any Year</SelectItem>
                       {years.map((year) => (
                         <SelectItem key={year} value={year.toString()}>
                           {year}
@@ -327,7 +327,7 @@ const Browse = () => {
                       <SelectValue placeholder="Any Rating" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any Rating</SelectItem>
+                      <SelectItem value="all">Any Rating</SelectItem>
                       <SelectItem value="9">9.0+</SelectItem>
                       <SelectItem value="8">8.0+</SelectItem>
                       <SelectItem value="7">7.0+</SelectItem>
