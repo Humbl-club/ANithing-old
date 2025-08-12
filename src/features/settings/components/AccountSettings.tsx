@@ -19,7 +19,8 @@ import {
   Eye,
   EyeOff,
   Trash2,
-  LogOut
+  LogOut,
+  Settings
 } from "lucide-react";
 
 export const AccountSettings = () => {
