@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAnimeDetail } from '@/hooks/useAnimeDetail';
-import { useMangaDetail } from '@/hooks/useMangaDetail';
+import { useContentDetail } from '@/hooks/useContentDetail';
 import { BaseContent, AnimeContent, MangaContent } from '@/types/content.types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -32,17 +31,7 @@ interface ContentDetailProps {
 export function ContentDetail({ contentType }: ContentDetailProps) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
-  // Use the appropriate hook based on content type
-  const animeResult = useAnimeDetail(contentType === 'anime' ? id! : '');
-  const mangaResult = useMangaDetail(contentType === 'manga' ? id! : '');
-  
-  const { anime, loading: animeLoading, error: animeError } = animeResult;
-  const { manga, loading: mangaLoading, error: mangaError } = mangaResult;
-  
-  const content = contentType === 'anime' ? anime : manga;
-  const loading = contentType === 'anime' ? animeLoading : mangaLoading;
-  const error = contentType === 'anime' ? animeError : mangaError;
+  const { data: content, isLoading: loading, error } = useContentDetail(id!, contentType);
   const [trailerOpen, setTrailerOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('info');
   const [isFavorited, setIsFavorited] = useState(false);
@@ -172,8 +161,9 @@ export function ContentDetail({ contentType }: ContentDetailProps) {
 
   // Enhanced error state with better UX and retry functionality
   if (error || !content) {
-    const isNetworkError = error?.includes('fetch') || error?.includes('network');
-    const isNotFound = error?.includes('not found') || !content;
+    const errorMessage = error?.message || error?.toString() || '';
+    const isNetworkError = errorMessage.includes('fetch') || errorMessage.includes('network');
+    const isNotFound = errorMessage.includes('not found') || errorMessage.includes('No rows') || !content;
     
     return (
       <>
