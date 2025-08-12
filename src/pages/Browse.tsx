@@ -129,6 +129,10 @@ const Browse = () => {
     updateFilters();
   }, [updateFilters]);
 
+  useEffect(() => {
+    performSearch();
+  }, [performSearch]);
+
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedType('all');
@@ -337,7 +341,7 @@ const Browse = () => {
 
           {/* Results */}
           <div className="space-y-4">
-            {loading ? (
+            {(loading || searchLoading) ? (
               <Card className="bg-black/40 border-pink-500/20">
                 <CardContent className="p-12 text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-4" />

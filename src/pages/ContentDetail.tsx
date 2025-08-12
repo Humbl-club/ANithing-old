@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, AlertCircle, Wifi, WifiOff, RefreshCcw } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Wifi, WifiOff, RefreshCcw, Heart, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
@@ -17,6 +17,8 @@ import {
   StreamingProviders,
   SocialSection
 } from '@/features/details/components';
+import { AddToListButton } from '@/shared/components/AddToListButton';
+import { cn } from '@/lib/utils';
 
 interface ContentDetailProps {
   contentType: 'anime' | 'manga';
@@ -337,12 +339,46 @@ export function ContentDetail({ contentType }: ContentDetailProps) {
           onWatchTrailer={() => setTrailerOpen(true)}
         />
 
-      {/* Main Content */}
-      <div className="container py-16">
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-12">
+      {/* Main Content - Enhanced Mobile Layout */}
+      <div className="container py-8 md:py-16 px-4 md:px-6">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 md:gap-8 xl:gap-12">
           
           {/* Primary Content Area */}
-          <div className="xl:col-span-3 space-y-16">
+          <div className="xl:col-span-3 space-y-8 md:space-y-12 xl:space-y-16">
+            
+            {/* Mobile Quick Actions - Only visible on mobile */}
+            <section className="xl:hidden">
+              <div className="bg-card border border-border rounded-xl p-4 space-y-4">
+                <h3 className="font-semibold text-sm">Quick Actions</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <AddToListButton 
+                    contentId={content.id} 
+                    contentType={contentType}
+                    contentTitle={content.title}
+                    className="w-full text-sm py-2"
+                  />
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    onClick={() => setIsFavorited(!isFavorited)}
+                    className="w-full"
+                  >
+                    <Heart className={cn("w-4 h-4 mr-2", isFavorited && "fill-current")} />
+                    {isFavorited ? 'Liked' : 'Like'}
+                  </Button>
+                </div>
+                
+                {/* Mobile streaming preview */}
+                <div className="pt-3 border-t border-border">
+                  <p className="text-xs text-muted-foreground mb-2">Available on:</p>
+                  <div className="flex gap-2">
+                    <Badge variant="outline" className="text-xs">Crunchyroll</Badge>
+                    <Badge variant="outline" className="text-xs">Netflix</Badge>
+                    <Badge variant="outline" className="text-xs">+2 more</Badge>
+                  </div>
+                </div>
+              </div>
+            </section>
             
             {/* Info Tabs */}
             <section>
@@ -371,11 +407,11 @@ export function ContentDetail({ contentType }: ContentDetailProps) {
             
           </div>
 
-          {/* Sidebar */}
-          <div className="xl:col-span-1 space-y-8">
+          {/* Sidebar - Better mobile handling */}
+          <div className="xl:col-span-1 space-y-6 md:space-y-8">
             
             {/* Streaming Providers */}
-            <section className="sticky top-8">
+            <section className="xl:sticky xl:top-8">
               <StreamingProviders 
                 content={content} 
                 contentType={contentType}
