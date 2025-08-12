@@ -53,7 +53,7 @@ export function ContentSection({
             {items.map((item) => (
               <div key={item.id} className="group">
                 <AnimeCard 
-                  anime={item} 
+                  content={item} 
                   onClick={() => onItemClick(item)}
                   getDisplayName={getDisplayName}
                 />
