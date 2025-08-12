@@ -48,17 +48,31 @@
     --gradient-secondary: linear-gradient(135deg, hsl(270 95% 50%), hsl(315 100% 65%));
     --gradient-hero: linear-gradient(135deg, hsl(219 100% 65% / 0.1), hsl(270 95% 50% / 0.1));
     --gradient-card: linear-gradient(135deg, hsl(220 20% 8%), hsl(220 15% 12%));
+    --gradient-pink: linear-gradient(135deg, hsl(329 75% 51%), hsl(315 100% 65%));
+    --gradient-purple: linear-gradient(135deg, hsl(270 91% 65%), hsl(280 100% 70%));
+    --gradient-rainbow: linear-gradient(135deg, hsl(219 100% 65%), hsl(270 95% 50%), hsl(329 75% 51%));
+    --gradient-button: linear-gradient(135deg, hsl(329 75% 51%), hsl(270 95% 50%));
+    --gradient-button-hover: linear-gradient(135deg, hsl(329 80% 56%), hsl(270 100% 55%));
     
     /* Apple Glassmorphism Effects */
     --glass-bg: hsl(220 20% 8% / 0.4);
     --glass-border: hsl(220 15% 20% / 0.3);
+    --glass-hover: hsl(220 20% 8% / 0.6);
+    --glass-focus: hsl(220 20% 8% / 0.8);
     --glass-blur: blur(20px);
     --glass-shadow: 0 8px 32px hsl(0 0% 0% / 0.4);
+    --glass-shadow-hover: 0 12px 40px hsl(0 0% 0% / 0.5);
+    --glass-shadow-focus: 0 16px 48px hsl(0 0% 0% / 0.6);
     
     /* Glow effects */
     --glow-primary: 0 0 30px hsl(219 100% 65% / 0.3);
     --glow-accent: 0 0 20px hsl(315 100% 65% / 0.4);
     --glow-card: 0 4px 20px hsl(0 0% 0% / 0.3);
+    --glow-pink: 0 0 25px hsl(329 75% 51% / 0.4);
+    --glow-purple: 0 0 25px hsl(270 91% 65% / 0.4);
+    --glow-rainbow: 0 0 30px hsl(219 100% 65% / 0.2), 0 0 40px hsl(329 75% 51% / 0.3);
+    --glow-button: 0 0 20px hsl(329 75% 51% / 0.3);
+    --glow-button-hover: 0 0 30px hsl(329 75% 51% / 0.5);
 
     /* Animation variables */
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);

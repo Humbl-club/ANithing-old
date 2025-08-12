@@ -100,7 +100,23 @@ export default {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-secondary': 'var(--gradient-secondary)',
 				'gradient-hero': 'var(--gradient-hero)',
-				'gradient-card': 'var(--gradient-card)'
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-pink': 'linear-gradient(135deg, hsl(329 75% 51%), hsl(315 100% 65%))',
+				'gradient-purple': 'linear-gradient(135deg, hsl(270 91% 65%), hsl(280 100% 70%))',
+				'gradient-rainbow': 'linear-gradient(135deg, hsl(219 100% 65%), hsl(270 95% 50%), hsl(329 75% 51%))',
+				'gradient-glass': 'linear-gradient(135deg, hsl(220 20% 8% / 0.4), hsl(220 15% 12% / 0.6))',
+				'shimmer': 'linear-gradient(110deg, transparent 40%, hsl(var(--foreground) / 0.1) 50%, transparent 60%)'
+			},
+			backdropBlur: {
+				xs: '2px',
+				sm: '4px',
+				md: '8px',
+				lg: '12px',
+				xl: '16px',
+				'2xl': '20px',
+				'3xl': '24px',
+				'glass': '20px',
+				'heavy': '40px'
 			},
 			boxShadow: {
 				'glow-primary': 'var(--glow-primary)',
