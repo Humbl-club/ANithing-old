@@ -3,15 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { AnimeCard } from '@/shared/components/AnimeCard';
 import { ChevronRight, Loader2 } from 'lucide-react';
-import type { Anime } from '@/data/animeData';
+import type { DomainTitle } from '@/repositories/contentRepository';
+
 interface ContentSectionProps {
   title: string;
   subtitle: string;
   icon: React.ComponentType<{ className?: string }>;
-  items: Anime[];
+  items: DomainTitle[];
   viewAllPath: string;
-  getDisplayName: (anime: Anime) => string;
-  onItemClick: (anime: Anime) => void;
+  getDisplayName: (content: DomainTitle) => string;
+  onItemClick: (content: DomainTitle) => void;
   className?: string;
 }
 export function ContentSection({
