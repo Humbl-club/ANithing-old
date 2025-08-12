@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import ANITHING Animations */
+@import './styles/animations.css';
+
 /* ANITHING Design System - Dark theme with pink accents and modern aesthetics */
 
 @layer base {
