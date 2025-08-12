@@ -1,17 +1,21 @@
 import { Suspense, memo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, TrendingUp, Clock, Star } from "lucide-react";
+import { Loader2 } from "lucide-react";
 // Layout components
 import { Navigation } from "@/layouts/components/Navigation";
 import { LegalFooter } from "@/layouts/components/LegalFooter";
 import { EmailVerificationBanner } from "@/features/user/components/EmailVerificationBanner";
-// Feature components
-import { HeroSection } from "@/features/home/components/HeroSection";
-import { ContentSection } from "@/features/home/components/ContentSection";
+// New feature components
+import { HeroBanner } from "@/features/home/components/HeroBanner";
+import { PersonalizedSection } from "@/features/home/components/PersonalizedSection";
+import { TrendingTabs } from "@/features/home/components/TrendingTabs";
+import { SeasonalAnime } from "@/features/home/components/SeasonalAnime";
+import { NewsAndUpdates } from "@/features/home/components/NewsAndUpdates";
+import { InfiniteScroll } from "@/features/home/components/InfiniteScroll";
+// Legacy components (kept for fallback)
 import { StatsSection } from "@/features/home/components/StatsSection";
 import { HealthStatus } from "@/features/home/components/HealthStatus";
 import { SearchResultsGrid } from "@/features/search/components/SearchResultsGrid";
-import { TrendingContentSection } from "@/features/home/components/TrendingContentSection";
 // Hooks
 import { useHomePageData } from "@/features/home/hooks/useHomePageData";
 import { useNamePreference } from "@/hooks/useNamePreference";
@@ -19,8 +23,9 @@ import { useSearch } from "@/features/search/hooks/useSearch";
 import { useAuth } from "@/hooks/useAuth";
 
 /**
- * Refactored Index page - optimized with memo and callbacks
- * Each section is now a separate component with its own responsibilities
+ * Completely Redesigned Index page with new aesthetics and modern UI
+ * Features: HeroBanner carousel, PersonalizedSection, TrendingTabs, SeasonalAnime, NewsUpdates
+ * Enhanced with smooth animations, parallax effects, and infinite scroll
 */
 
 // Simple loading screen - no need to memoize
@@ -47,11 +52,14 @@ const ErrorScreen = ({ error }: { error: Error }) => {
   );
 };
 
-// Simple hero skeleton - no need to memoize
-const HeroSkeleton = () => {
+// Hero banner skeleton
+const HeroBannerSkeleton = () => {
   return (
-    <div className="h-[600px] flex items-center justify-center bg-muted/10">
-      <Loader2 className="w-8 h-8 animate-spin" />
+    <div className="h-[100vh] flex items-center justify-center bg-gradient-to-br from-muted/20 to-background animate-pulse">
+      <div className="text-center space-y-4">
+        <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
+        <p className="text-muted-foreground">Loading amazing content...</p>
+      </div>
     </div>
   );
 };
@@ -99,79 +107,53 @@ const IndexRefactored = memo(() => {
   }
   
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative overflow-x-hidden">
       <Navigation />
       
-      {/* Hero Section */}
-      <Suspense fallback={<HeroSkeleton />}>
-        <HeroSection />
-      </Suspense>
-      
-      {/* Search Results or Content Sections */}
+      {/* Search Results Override */}
       {isSearching && hasSearchResults ? (
-        <SearchResultsGrid 
-          results={searchResults.items}
-          totalCount={searchResults.total}
-          isLoading={searchResults.isSearching}
-          onItemClick={handleContentClick}
-          getDisplayName={getDisplayName}
-        />
+        <div className="pt-20">
+          <SearchResultsGrid 
+            results={searchResults.items}
+            totalCount={searchResults.total}
+            isLoading={searchResults.isSearching}
+            onItemClick={handleContentClick}
+            getDisplayName={getDisplayName}
+          />
+        </div>
       ) : (
         <>
-          {/* Trending Anime Section */}
-          {showTrendingAnime && (
-            <ContentSection
-              title="🔥 Trending Anime"
-              subtitle="Most popular anime right now"
-              icon={TrendingUp}
-              items={sections.trendingAnime}
-              viewAllPath="/anime"
-              getDisplayName={getDisplayName}
-              onItemClick={handleContentClick}
-            />
-          )}
+          {/* Hero Banner with Featured Carousel */}
+          <Suspense fallback={<HeroBannerSkeleton />}>
+            <HeroBanner onSearch={setSearchQuery} />
+          </Suspense>
           
-          {/* Recent Anime Section */}
-          {showRecentAnime && (
-            <ContentSection
-              title="🆕 Recently Added"
-              subtitle="Latest anime additions"
-              icon={Clock}
-              items={sections.recentAnime}
-              viewAllPath="/anime?sort=recent"
-              getDisplayName={getDisplayName}
-              onItemClick={handleContentClick}
-              className="bg-muted/10"
-            />
-          )}
+          {/* Personalized Section (for logged-in users) */}
+          <PersonalizedSection onItemClick={handleContentClick} />
           
-          {/* Trending Content Components */}
-          <div className="container mx-auto px-4">
-            <TrendingContentSection 
-              contentType="anime" 
-              title="🔥 Trending Anime" 
-              limit={24}
-            />
-            <TrendingContentSection 
-              contentType="manga" 
-              title="📚 Trending Manga" 
-              limit={18}
-            />
-          </div>
+          {/* Trending Content with Tabs */}
+          <TrendingTabs onItemClick={handleContentClick} />
+          
+          {/* Seasonal Anime */}
+          <SeasonalAnime onItemClick={handleContentClick} />
+          
+          {/* News and Updates */}
+          <NewsAndUpdates className="bg-gradient-to-b from-background/80 to-background" />
+          
+          {/* Stats Section (Legacy) */}
+          <StatsSection />
         </>
       )}
-      
-      {/* Stats Section */}
-      <StatsSection />
       
       {/* Footer */}
       <LegalFooter />
       
-      {/* Email Verification Banner */}
+      {/* Floating Elements */}
       <EmailVerificationBanner />
-      
-      {/* Health Status Indicator */}
       <HealthStatus />
+      
+      {/* Scroll to Top Button */}
+      <ScrollToTopButton />
     </div>
   );
 });

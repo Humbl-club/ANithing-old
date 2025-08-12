@@ -2,7 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Anime-inspired design system with vibrant gradients and modern aesthetics */
+/* Import ANITHING Animations */
+@import './styles/animations.css';
+
+/* ANITHING Design System - Dark theme with pink accents and modern aesthetics */
 
 @layer base {
   :root {
