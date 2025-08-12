@@ -1,0 +1,188 @@
+/* Settings-based visual effects */
+
+/* Compact mode styles */
+.compact-mode {
+  --spacing-scale: 0.75;
+  --font-size-scale: 0.95;
+}
+
+.compact-mode .glass-card {
+  padding: calc(1rem * var(--spacing-scale));
+}
+
+.compact-mode .p-4 {
+  padding: calc(1rem * var(--spacing-scale));
+}
+
+.compact-mode .p-6 {
+  padding: calc(1.5rem * var(--spacing-scale));
+}
+
+.compact-mode .space-y-6 > * + * {
+  margin-top: calc(1.5rem * var(--spacing-scale));
+}
+
+.compact-mode .space-y-4 > * + * {
+  margin-top: calc(1rem * var(--spacing-scale));
+}
+
+.compact-mode h1 {
+  font-size: calc(2.25rem * var(--font-size-scale));
+}
+
+.compact-mode h2 {
+  font-size: calc(1.875rem * var(--font-size-scale));
+}
+
+.compact-mode h3 {
+  font-size: calc(1.5rem * var(--font-size-scale));
+}
+
+/* Data saver mode styles */
+.data-saver img {
+  filter: contrast(0.9) brightness(0.95);
+}
+
+.data-saver .glass-card {
+  backdrop-filter: none;
+  background: hsl(var(--card)) !important;
+}
+
+.data-saver [class*="glow"] {
+  box-shadow: none !important;
+}
+
+.data-saver .bg-gradient-hero {
+  background: hsl(var(--background)) !important;
+}
+
+/* Glassmorphism toggle */
+:root[style*="--glassmorphism-enabled: 0"] .glass-card {
+  backdrop-filter: none !important;
+  background: hsl(var(--card)) !important;
+}
+
+:root[style*="--glassmorphism-enabled: 0"] .glow-card {
+  box-shadow: none !important;
+}
+
+/* Animations toggle */
+.no-animations,
+:root[style*="--animations-enabled: 0"] {
+  * {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* Theme-specific overrides */
+.dark {
+  --glassmorphism-opacity: 0.1;
+}
+
+.light {
+  --glassmorphism-opacity: 0.8;
+}
+
+/* Performance optimizations for data saver */
+.data-saver * {
+  will-change: auto !important;
+}
+
+.data-saver .animate-spin {
+  animation: none !important;
+}
+
+.data-saver [class*="animate-"] {
+  animation: none !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .glass-card {
+    border-width: 2px;
+    background: hsl(var(--card)) !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .no-animations * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Settings preview effects */
+.settings-preview {
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, hsl(var(--primary) / 0.05) 50%, transparent 70%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Settings form enhancements */
+.settings-form-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.settings-form-row:hover {
+  background: hsl(var(--muted) / 0.5);
+}
+
+.settings-section {
+  scroll-margin-top: 2rem;
+}
+
+/* Accessibility improvements */
+.settings-toggle:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+.settings-card:focus-within {
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .compact-mode {
+    --spacing-scale: 0.6;
+  }
+  
+  .settings-form-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .data-saver img {
+    max-width: 50vw;
+    height: auto;
+  }
+}

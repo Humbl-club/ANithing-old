@@ -14,6 +14,7 @@ import { InstallPrompt } from "@/shared/components/InstallPrompt";
 import { GraphQLProvider } from "@/providers/GraphQLProvider";
 import { useInitializationStore } from '@/store/initializationStore';
 import { useUserInitialization } from '@/hooks/useUserInitialization';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 import { 
   createLazyPage, 
   ComponentPreloader, 
@@ -41,6 +42,10 @@ const Analytics = createLazyPage(() => import('./pages/Analytics'), 'Analytics')
 const Gamification = createLazyPage(() => import('./pages/Gamification'), 'Gamification');
 const AdminDashboard = createLazyPage(() => import('./pages/admin/AdminDashboard'), 'Admin Dashboard');
 const Settings = createLazyPage(() => import('./pages/Settings'), 'Settings');
+const Activity = createLazyPage(() => import('./pages/Activity'), 'Activity');
+const Browse = createLazyPage(() => import('./pages/Browse'), 'Browse');
+const Creator = createLazyPage(() => import('./pages/Creator'), 'Creator');
+const Studio = createLazyPage(() => import('./pages/Studio'), 'Studio');
 
 // Define routes outside component to prevent recreation
 const routes = [
@@ -59,6 +64,10 @@ const routes = [
   { path: '/gamification', element: Gamification, protected: true },
   { path: '/admin', element: AdminDashboard, protected: true },
   { path: '/settings', element: Settings, protected: true },
+  { path: '/activity', element: Activity, protected: true },
+  { path: '/browse', element: Browse, protected: false },
+  { path: '/creator/:slug', element: Creator, protected: false },
+  { path: '/studio/:slug', element: Studio, protected: false },
   { path: '/404', element: NotFound, protected: false },
   { path: '*', element: NotFound, protected: false }
 ];
@@ -206,13 +215,15 @@ const App = () => {
             <TooltipProvider>
               <Toaster />
               <AuthProvider>
-                <InitializationWrapper>
-                  {!isInitialized ? (
-                    <InitializationLoader />
-                  ) : (
-                    appContent
-                  )}
-                </InitializationWrapper>
+                <ThemeProvider>
+                  <InitializationWrapper>
+                    {!isInitialized ? (
+                      <InitializationLoader />
+                    ) : (
+                      appContent
+                    )}
+                  </InitializationWrapper>
+                </ThemeProvider>
               </AuthProvider>
             </TooltipProvider>
           </ErrorBoundary>

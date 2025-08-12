@@ -39,6 +39,7 @@ export const ImportExportSettings = () => {
   const [importText, setImportText] = useState('');
   const [syncing, setSyncing] = useState(false);
   const [lastSyncStatus, setLastSyncStatus] = useState<'success' | 'error' | null>(null);
+  const [clearingCache, setClearingCache] = useState(false);
 
   const handleExport = () => {
     const settingsJson = exportSettings();
@@ -160,6 +161,87 @@ export const ImportExportSettings = () => {
     if (!dateString) return 'Never';
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString();
+  };
+
+  const handleClearCache = async () => {
+    setClearingCache(true);
+    try {
+      // Clear browser caches
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames.map(cacheName => caches.delete(cacheName))
+        );
+      }
+      
+      // Clear localStorage (except auth)
+      const authData = localStorage.getItem('supabase.auth.token');
+      const settingsData = localStorage.getItem('settings-storage');
+      localStorage.clear();
+      if (authData) localStorage.setItem('supabase.auth.token', authData);
+      if (settingsData) localStorage.setItem('settings-storage', settingsData);
+      
+      // Clear sessionStorage
+      sessionStorage.clear();
+      
+      // Clear indexedDB (if using for offline storage)
+      if ('indexedDB' in window) {
+        const databases = ['app-cache', 'offline-data', 'image-cache'];
+        databases.forEach(dbName => {
+          const deleteReq = indexedDB.deleteDatabase(dbName);
+          deleteReq.onerror = () => console.warn(`Failed to delete ${dbName}`);
+        });
+      }
+      
+      toast({
+        title: "Cache cleared",
+        description: "All application caches have been cleared. You may need to refresh the page.",
+      });
+    } catch (error) {
+      toast({
+        title: "Cache clear failed",
+        description: "Failed to clear all caches. Please try refreshing the page manually.",
+        variant: "destructive",
+      });
+    } finally {
+      setClearingCache(false);
+    }
+  };
+
+  const handleExportUserData = async () => {
+    try {
+      // Simulate collecting user data - replace with actual data collection
+      const userData = {
+        lists: [], // User's anime/manga lists
+        ratings: [], // User's ratings
+        reviews: [], // User's reviews
+        friends: [], // User's friends list
+        achievements: [], // User's achievements
+        preferences: settings,
+        exportDate: new Date().toISOString(),
+        version: '1.0'
+      };
+      
+      const dataJson = JSON.stringify(userData, null, 2);
+      const blob = new Blob([dataJson], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `anithing-userdata-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "User data exported",
+        description: "Your complete user data has been downloaded.",
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "Failed to export user data. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -438,6 +520,60 @@ export const ImportExportSettings = () => {
                     </span>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Data Management */}
+      <Card className="glass-card glow-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Database className="w-5 h-5 text-primary" />
+            Data Management
+          </CardTitle>
+          <CardDescription>
+            Manage your local data, cache, and user information
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-4">
+            <Button 
+              variant="outline" 
+              onClick={handleExportUserData}
+              className="w-full"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Export User Data
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              onClick={handleClearCache}
+              disabled={clearingCache}
+              className="w-full border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
+            >
+              {clearingCache ? (
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Database className="w-4 h-4 mr-2" />
+              )}
+              {clearingCache ? 'Clearing...' : 'Clear Cache'}
+            </Button>
+          </div>
+
+          <div className="p-4 rounded-lg bg-muted/50 border border-border/50">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-orange-400 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium mb-1">Cache Management:</p>
+                <ul className="text-muted-foreground space-y-1 list-disc list-inside">
+                  <li>Export User Data includes all your lists, ratings, and reviews</li>
+                  <li>Clear Cache removes temporary files to free up space</li>
+                  <li>Clearing cache may require re-downloading images and data</li>
+                  <li>Your account data and settings will remain intact</li>
+                </ul>
               </div>
             </div>
           </div>

@@ -54,10 +54,11 @@ export const ContentCard = memo(<T extends BaseContent>({
 
   return (
     <Card 
-      className="content-card cursor-pointer group relative h-[400px] hover-scale"
+      variant="appleGlass"
+      className="content-card cursor-pointer group relative h-[400px] hover-scale transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1"
       onClick={handleCardClick}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10" />
       
       {/* Image */}
       <div className="relative h-full overflow-hidden">
@@ -70,16 +71,16 @@ export const ContentCard = memo(<T extends BaseContent>({
         
         {/* Status Badge */}
         {content.status && (
-          <Badge className="absolute top-3 right-3 z-20 glass-card">
+          <Badge className="absolute top-3 right-3 z-20 bg-white/15 backdrop-blur-xl border-white/20 text-white hover:bg-white/25">
             {content.status}
           </Badge>
         )}
         
         {/* Score */}
         {content.score && (
-          <div className="absolute top-3 left-3 z-20 p-2 glass-card rounded-full flex items-center gap-1">
-            <Star className="w-3 h-3 text-yellow-400" />
-            <span className="text-xs font-semibold">{content.score}</span>
+          <div className="absolute top-3 left-3 z-20 p-2 bg-white/15 backdrop-blur-xl border border-white/20 rounded-full flex items-center gap-1 hover:bg-white/25 transition-all">
+            <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+            <span className="text-xs font-semibold text-white">{content.score}</span>
           </div>
         )}
 
@@ -87,14 +88,14 @@ export const ContentCard = memo(<T extends BaseContent>({
         <div className="absolute top-12 right-3 z-20 dropdown-trigger">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <Button variant="appleGlass" size="sm" className="h-8 w-8 p-0 hover:scale-110">
                 <MoreVertical className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>View Details</DropdownMenuItem>
-              <DropdownMenuItem>Share</DropdownMenuItem>
-              <DropdownMenuItem>Report</DropdownMenuItem>
+            <DropdownMenuContent className="bg-black/90 backdrop-blur-xl border-white/20">
+              <DropdownMenuItem className="text-white hover:bg-white/10">View Details</DropdownMenuItem>
+              <DropdownMenuItem className="text-white hover:bg-white/10">Share</DropdownMenuItem>
+              <DropdownMenuItem className="text-white hover:bg-white/10">Report</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

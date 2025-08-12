@@ -251,7 +251,7 @@ const TrendingTabs = memo(({ onItemClick }: TrendingTabsProps) => {
             </div>
             <div className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
-              {currentData.filter(item => item.score >= 8.0).length} highly rated
+              {currentData.filter(item => item.score && item.score >= 8.0).length} highly rated
             </div>
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4" />
@@ -271,7 +271,13 @@ const TrendingTabs = memo(({ onItemClick }: TrendingTabsProps) => {
                     </div>
                   </div>
                   <AnimeCard
-                    content={item}
+                    content={{
+                      ...item,
+                      score: item.score ?? undefined,
+                      cover_image: item.image_url,
+                      description: item.synopsis,
+                      status: item.details?.status
+                    }}
                     onClick={() => handleItemClick(item)}
                     getDisplayName={getDisplayName}
                     className="transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2"
@@ -296,7 +302,7 @@ const TrendingTabs = memo(({ onItemClick }: TrendingTabsProps) => {
                       </div>
                       <div className="w-16 h-24 rounded-lg overflow-hidden">
                         <img 
-                          src={item.cover_image} 
+                          src={item.image_url} 
                           alt={getDisplayName(item)}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         />
@@ -307,11 +313,11 @@ const TrendingTabs = memo(({ onItemClick }: TrendingTabsProps) => {
                         {getDisplayName(item)}
                       </h3>
                       <p className="text-sm text-muted-foreground line-clamp-2">
-                        {item.description?.replace(/<[^>]*>/g, '').substring(0, 100)}...
+                        {item.synopsis?.replace(/<[^>]*>/g, '').substring(0, 100)}...
                       </p>
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span>{item.year}</span>
-                        <span className="capitalize">{item.status}</span>
+                        <span className="capitalize">{item.details?.status}</span>
                         {item.score && (
                           <span className="text-yellow-400">★ {item.score.toFixed(1)}</span>
                         )}

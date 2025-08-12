@@ -83,7 +83,8 @@
       "Bash(screencapture:*)",
       "WebFetch(domain:localhost)",
       "mcp__ide__getDiagnostics",
-      "Bash(npx playwright test:*)"
+      "Bash(npx playwright test:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }

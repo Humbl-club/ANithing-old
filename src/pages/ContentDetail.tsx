@@ -115,7 +115,7 @@ export function ContentDetail({ contentType }: ContentDetailProps) {
   }
 
   const handleEpisodeClick = (episode: number) => {
-    console.log(`Clicked episode ${episode}`);
+    // Handle episode selection
     // Add logic to navigate to episode or handle episode selection
   };
 

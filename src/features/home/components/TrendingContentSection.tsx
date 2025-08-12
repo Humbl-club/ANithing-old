@@ -44,11 +44,13 @@ export function TrendingContentSection() {
   if (!trendingContent.length) return null;
 
   return (
-    <Card>
+    <Card variant="appleGlass" className="hover:scale-[1.005] transition-all duration-500">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5" />
-          Trending Now
+        <CardTitle className="flex items-center gap-2 text-xl font-semibold">
+          <div className="p-2 bg-gradient-to-r from-pink-500/20 to-purple-600/20 rounded-xl backdrop-blur-xl border border-pink-500/30">
+            <TrendingUp className="h-5 w-5 text-pink-400" />
+          </div>
+          <span className="text-gradient-primary">Trending Now</span>
         </CardTitle>
       </CardHeader>
       <CardContent>

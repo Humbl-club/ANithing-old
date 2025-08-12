@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { z } from 'zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -88,8 +89,53 @@ export const ProfileSettings = () => {
     await updateProfile({ favorite_genres: newGenres });
   };
 
+  const validateField = (field: string, value: string): string | null => {
+    switch (field) {
+      case 'display_name':
+        if (value.length > 50) return 'Display name must be 50 characters or less';
+        if (value.length > 0 && value.length < 2) return 'Display name must be at least 2 characters';
+        break;
+      case 'bio':
+        if (value.length > 500) return 'Bio must be 500 characters or less';
+        break;
+      case 'website':
+        if (value && !z.string().url().safeParse(value).success) {
+          return 'Please enter a valid URL';
+        }
+        break;
+      case 'twitter_handle':
+        if (value && (value.includes('@') || value.includes('/'))) {
+          return 'Enter only the username, without @ or /';
+        }
+        if (value.length > 15) return 'Twitter username must be 15 characters or less';
+        break;
+      case 'location':
+        if (value.length > 100) return 'Location must be 100 characters or less';
+        break;
+    }
+    return null;
+  };
+
   const handleFieldUpdate = async (field: keyof typeof profile, value: string) => {
-    await updateProfile({ [field]: value });
+    const error = validateField(field, value);
+    if (error) {
+      toast({
+        title: "Validation Error",
+        description: error,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      await updateProfile({ [field]: value });
+    } catch (error: any) {
+      toast({
+        title: "Update Failed",
+        description: error.message || 'Failed to update profile',
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -171,7 +217,11 @@ export const ProfileSettings = () => {
                 onChange={(e) => handleFieldUpdate('display_name', e.target.value)}
                 placeholder="Your display name"
                 disabled={loading}
+                maxLength={50}
               />
+              <p className="text-xs text-muted-foreground">
+                {profile.display_name?.length || 0} / 50 characters
+              </p>
             </div>
             
             <div className="space-y-2">

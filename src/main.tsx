@@ -110,7 +110,9 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('offline', updateOnlineStatus);
 }
 // Initialize Sentry before rendering (async for bundle optimization)
-initSentry().catch(console.error);
+initSentry().catch(() => {
+  // Sentry initialization failed - continue without error tracking
+});
 // Setup API error tracking
 setupApiErrorTracking();
 // Initialize mobile optimizations

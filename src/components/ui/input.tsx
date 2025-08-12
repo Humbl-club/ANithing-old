@@ -3,16 +3,17 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const inputVariants = cva(
-  "flex w-full rounded-lg px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm transition-all duration-300",
+  "flex w-full rounded-xl px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm transition-all duration-300",
   {
     variants: {
       variant: {
         default: "border border-input bg-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        glass: "bg-glass backdrop-blur-lg border border-glass-border focus:bg-glass-focus focus:border-primary/40 focus:shadow-glow-primary",
-        outline: "border-2 border-border bg-transparent focus:border-primary focus:shadow-glow-primary",
-        filled: "bg-muted border border-transparent focus:bg-background focus:border-primary",
-        underline: "border-0 border-b-2 border-border rounded-none bg-transparent focus:border-primary px-0",
-        floating: "bg-glass/50 backdrop-blur-md border border-glass-border hover:bg-glass-hover focus:bg-glass-focus focus:border-primary/50 focus:shadow-lg"
+        glass: "bg-white/8 backdrop-blur-xl border border-white/20 focus:bg-white/12 focus:border-primary/40 focus:shadow-glow-primary hover:bg-white/10 hover:border-white/25",
+        appleGlass: "bg-white/6 backdrop-blur-2xl border border-white/15 focus:bg-white/10 focus:border-white/30 focus:shadow-glass-lg hover:bg-white/8 hover:border-white/20",
+        outline: "border-2 border-white/20 bg-transparent backdrop-blur-xl focus:border-primary focus:shadow-glow-primary hover:border-white/30",
+        filled: "bg-white/10 backdrop-blur-xl border border-white/10 focus:bg-white/15 focus:border-primary hover:bg-white/12",
+        underline: "border-0 border-b-2 border-white/20 rounded-none bg-transparent focus:border-primary px-0 backdrop-blur-xl",
+        floating: "bg-white/8 backdrop-blur-2xl border border-white/15 hover:bg-white/10 focus:bg-white/12 focus:border-primary/50 focus:shadow-glass-lg"
       },
       size: {
         sm: "h-8 text-xs",
@@ -41,6 +42,24 @@ export interface InputProps
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, variant, size, state, type, ...props }, ref) => {
+    const isGlassVariant = variant && ['glass', 'appleGlass', 'floating'].includes(variant);
+    
+    if (isGlassVariant) {
+      return (
+        <div className="relative">
+          <input
+            type={type}
+            className={cn(inputVariants({ variant, size, state }), "relative z-10", className)}
+            ref={ref}
+            {...props}
+          />
+          {/* Glass reflection effects */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-transparent to-transparent pointer-events-none rounded-xl" />
+          <div className="absolute top-0 left-2 right-2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+        </div>
+      );
+    }
+    
     return (
       <input
         type={type}
@@ -57,7 +76,7 @@ const GlassInput = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, ...props }, ref) => {
     return (
       <Input
-        variant="glass"
+        variant="appleGlass"
         className={cn("glass-input", className)}
         ref={ref}
         {...props}

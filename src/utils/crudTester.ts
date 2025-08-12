@@ -38,7 +38,7 @@ export class CRUDTester {
       };
       
       this.results.push(testResult);
-      console.log(`✅ ${operation}: ${duration}ms`);
+      // Operation successful
       return testResult;
     } catch (error) {
       const duration = Date.now() - startTime;
@@ -51,7 +51,7 @@ export class CRUDTester {
       };
       
       this.results.push(testResult);
-      console.error(`❌ ${operation}: ${testResult.error} (${duration}ms)`);
+      // Operation failed
       return testResult;
     }
   }
@@ -280,7 +280,7 @@ export class CRUDTester {
       averageDuration: number;
     };
   }> {
-    console.log('🧪 Starting comprehensive CRUD test suite...');
+    // Starting comprehensive CRUD test suite
     this.results = [];
 
     // Test database connection
@@ -314,17 +314,10 @@ export class CRUDTester {
       averageDuration: Math.round(averageDuration)
     };
 
-    console.log(`\n📊 Test Summary:`);
-    console.log(`Total: ${summary.total}`);
-    console.log(`Passed: ${summary.passed} ✅`);
-    console.log(`Failed: ${summary.failed} ❌`);
-    console.log(`Average Duration: ${summary.averageDuration}ms`);
+    // Test summary completed
 
     if (failed > 0) {
-      console.log('\n❌ Failed Tests:');
-      this.results
-        .filter(r => !r.success)
-        .forEach(r => console.log(`  - ${r.operation}: ${r.error}`));
+      // Failed tests recorded in results
     }
 
     return { results: this.results, summary };

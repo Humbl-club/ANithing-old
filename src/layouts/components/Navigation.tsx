@@ -67,10 +67,40 @@ function generateBreadcrumbs(pathname: string) {
   const paths = pathname.split('/').filter(Boolean);
   const breadcrumbs = [{ label: 'Home', path: '/' }];
   
+  // Route-specific label mapping
+  const routeLabels: { [key: string]: string } = {
+    'anime': 'Anime',
+    'manga': 'Manga',
+    'browse': 'Browse',
+    'trending': 'Trending',
+    'my-lists': 'My Lists',
+    'analytics': 'Analytics',
+    'settings': 'Settings',
+    'activity': 'Activity Feed',
+    'creator': 'Creator',
+    'studio': 'Studio',
+    'user': 'User Profile',
+    'gamification': 'Gamification',
+    'admin': 'Admin'
+  };
+  
   let currentPath = '';
   paths.forEach((path, index) => {
     currentPath += `/${path}`;
-    const label = path.charAt(0).toUpperCase() + path.slice(1).replace('-', ' ');
+    
+    // Use custom label if available, otherwise format the path
+    let label = routeLabels[path] || path.charAt(0).toUpperCase() + path.slice(1).replace('-', ' ');
+    
+    // For dynamic routes like /creator/slug or /studio/slug, show the slug nicely formatted
+    if (index > 0) {
+      const previousPath = paths[index - 1];
+      if (previousPath === 'creator' || previousPath === 'studio' || previousPath === 'user') {
+        label = path.split('-').map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+      }
+    }
+    
     breadcrumbs.push({ label, path: currentPath });
   });
   
@@ -181,11 +211,13 @@ export function Navigation() {
     { path: '/', label: 'Home', icon: Home, shortcut: 'H' },
     { path: '/anime', label: 'Anime', icon: Film, shortcut: 'A' },
     { path: '/manga', label: 'Manga', icon: BookOpen, shortcut: 'M' },
+    { path: '/browse', label: 'Browse', icon: Search, shortcut: 'B' },
     { path: '/trending', label: 'Trending', icon: TrendingUp, shortcut: 'T' },
   ];
 
   const userNavItems = user ? [
     { path: '/my-lists', label: 'My Lists', icon: List, shortcut: 'L' },
+    { path: '/activity', label: 'Activity', icon: Activity, shortcut: 'F' },
     { path: '/analytics', label: 'Analytics', icon: BarChart3, shortcut: 'S' },
     { path: '/settings', label: 'Settings', icon: Settings, shortcut: 'E' },
   ] : [];
@@ -240,10 +272,10 @@ export function Navigation() {
       {/* Main Navigation */}
       <motion.nav 
         className={cn(
-          "sticky top-0 z-50 w-full transition-all duration-300",
+          "sticky top-0 z-50 w-full transition-all duration-500",
           scrolled 
-            ? "bg-black/80 backdrop-blur-xl border-b border-pink-500/20 shadow-lg shadow-pink-500/10" 
-            : "bg-gradient-to-r from-black via-purple-900/20 to-black border-b border-pink-500/10"
+            ? "bg-black/70 backdrop-blur-2xl border-b border-pink-500/30 shadow-glass-xl shadow-pink-500/10" 
+            : "bg-gradient-to-r from-black/50 via-purple-900/30 to-black/50 backdrop-blur-xl border-b border-pink-500/20"
         )}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -323,7 +355,7 @@ export function Navigation() {
                     ref={searchRef}
                     type="text"
                     placeholder="Search anime, manga... (⌘K)"
-                    className="w-full pl-10 pr-4 py-2 bg-white/5 border border-pink-500/20 rounded-lg text-white placeholder-pink-300/50 focus:outline-none focus:border-pink-400 focus:bg-white/10 transition-all backdrop-blur-sm"
+                    className="w-full pl-10 pr-4 py-2 bg-white/8 border border-pink-500/20 rounded-xl text-white placeholder-pink-300/50 focus:outline-none focus:border-pink-400 focus:bg-white/12 transition-all backdrop-blur-xl hover:bg-white/10 hover:border-pink-500/30"
                     onFocus={() => setQuickSearchOpen(true)}
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-pink-300/50 hidden group-hover:block">
@@ -364,7 +396,7 @@ export function Navigation() {
                           </Button>
                         </motion.div>
                       </PopoverTrigger>
-                      <PopoverContent className="w-80 p-0 bg-black/90 backdrop-blur-xl border-pink-500/20" align="end">
+                      <PopoverContent className="w-80 p-0 bg-black/80 backdrop-blur-2xl border-pink-500/30 shadow-glass-xl" align="end">
                         <div className="p-4 border-b border-pink-500/20">
                           <div className="flex items-center justify-between">
                             <h3 className="font-semibold text-white">Notifications</h3>
@@ -444,7 +476,7 @@ export function Navigation() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                          <Button variant="ghost" className="relative h-10 w-auto px-3 rounded-full bg-gradient-to-r from-pink-500/20 to-purple-600/20 border border-pink-500/30 hover:from-pink-500/30 hover:to-purple-600/30">
+                          <Button variant="ghost" className="relative h-10 w-auto px-3 rounded-xl bg-white/10 backdrop-blur-xl border border-pink-500/30 hover:bg-white/15 hover:border-pink-500/40 hover:scale-105 transition-all duration-300">
                             <div className="flex items-center gap-3">
                               <div className="relative">
                                 <Avatar className="h-8 w-8 border-2 border-pink-400/50">
@@ -473,7 +505,7 @@ export function Navigation() {
                           </Button>
                         </motion.div>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-64 bg-black/90 backdrop-blur-xl border-pink-500/20" align="end" forceMount>
+                      <DropdownMenuContent className="w-64 bg-black/80 backdrop-blur-2xl border-pink-500/30 shadow-glass-xl" align="end" forceMount>
                         <DropdownMenuLabel className="font-normal p-4">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-12 w-12 border-2 border-pink-400/50">

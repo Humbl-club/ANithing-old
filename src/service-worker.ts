@@ -266,8 +266,7 @@ async function syncAnalytics() {
       timestamp: Date.now()
     };
     
-    // Send to analytics endpoint (if available)
-    console.log('Service Worker Performance Metrics:', metrics);
+    // Performance metrics collected for analytics
     
     // Reset counters
     requestCount = 0;
@@ -290,7 +289,7 @@ async function syncUserData() {
           await cache.delete(request);
         }
       } catch (error) {
-        console.error('Sync failed for:', request.url);
+        // Sync failed for request - will retry later
       }
     }
   } catch (error) {
@@ -313,7 +312,7 @@ self.addEventListener('push', (event) => {
       notificationData = { ...notificationData, ...data };
     }
   } catch (error) {
-    console.error('Failed to parse push notification data:', error);
+    // Failed to parse push notification data - using defaults
   }
   
   const options = {
@@ -404,7 +403,7 @@ async function optimizeCache() {
       }
     }
     
-    console.log('Cache optimization completed');
+    // Cache optimization completed successfully
   } catch (error) {
     console.error('Cache optimization failed:', error);
   }

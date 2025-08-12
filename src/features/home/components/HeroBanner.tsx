@@ -175,7 +175,7 @@ const HeroBanner = memo(({ onSearch }: HeroBannerProps) => {
                 {currentContent?.genres?.slice(0, 4).map((genre) => (
                   <span
                     key={genre}
-                    className="px-3 py-1 bg-white/10 backdrop-blur-sm rounded-full text-xs font-medium border border-white/20"
+                    className="px-3 py-1 bg-white/10 backdrop-blur-xl rounded-xl text-xs font-medium border border-white/20 hover:bg-white/15 hover:border-white/30 hover:scale-105 transition-all duration-300"
                   >
                     {genre}
                   </span>
@@ -202,16 +202,16 @@ const HeroBanner = memo(({ onSearch }: HeroBannerProps) => {
                   </Button>
                 )}
                 <Button
-                  variant="outline"
-                  className="px-8 py-3 text-lg glass-button hover:bg-white/10"
+                  variant="appleGlass"
+                  className="px-8 py-3 text-lg hover:-translate-y-1"
                   size="lg"
                 >
                   <Info className="w-5 h-5 mr-2" />
                   More Info
                 </Button>
                 <Button
-                  variant="outline"
-                  className="px-6 py-3 glass-button hover:bg-primary/10 hover:text-primary"
+                  variant="appleGlass"
+                  className="px-6 py-3 hover:bg-primary/10 hover:text-primary hover:-translate-y-1"
                   size="lg"
                 >
                   <Plus className="w-5 h-5" />
@@ -221,7 +221,7 @@ const HeroBanner = memo(({ onSearch }: HeroBannerProps) => {
 
             {/* Search Bar */}
             <div className="max-w-2xl">
-              <div className="glass-card border border-primary/20 p-4 hover:border-primary/40 transition-all duration-300">
+              <div className="bg-white/8 backdrop-blur-2xl border border-white/20 rounded-xl p-4 hover:border-primary/40 hover:bg-white/10 transition-all duration-500 hover:scale-[1.01] hover:-translate-y-0.5">
                 <UnifiedSearchBar
                   placeholder="Search anime, manga, characters..."
                   className="w-full glass-search"
@@ -239,14 +239,14 @@ const HeroBanner = memo(({ onSearch }: HeroBannerProps) => {
           {/* Arrow Controls */}
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 glass-button p-3 hover:bg-white/20 transition-all duration-300 hover:scale-110"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-3 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-110 hover:-translate-y-1"
             aria-label="Previous slide"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 glass-button p-3 hover:bg-white/20 transition-all duration-300 hover:scale-110"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-3 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-110 hover:-translate-y-1"
             aria-label="Next slide"
           >
             <ChevronRight className="w-6 h-6" />

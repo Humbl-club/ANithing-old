@@ -125,7 +125,20 @@ export const AddToListButton = ({
   };
   if (!user) {
     return (
-      <Button data-testid="add-to-list-btn" variant={variant} size={size} className={className} disabled>
+      <Button 
+        data-testid="add-to-list-btn" 
+        variant={variant} 
+        size={size} 
+        className={className}
+        onClick={() => {
+          toast.info("Please sign in to add items to your list", {
+            action: {
+              label: "Sign In",
+              onClick: () => window.location.href = "/auth?mode=signin"
+            },
+          });
+        }}
+      >
         <Plus className="w-4 h-4 mr-2" />
         Sign in to Add
       </Button>

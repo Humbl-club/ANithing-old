@@ -106,6 +106,12 @@ const IndexRefactored = memo(() => {
   if (error) {
     return <ErrorScreen error={error} />;
   }
+
+  // Check if we have any content at all
+  const hasAnyContent = sections.trendingAnime.length > 0 || 
+                       sections.recentAnime.length > 0 || 
+                       sections.trendingManga.length > 0 || 
+                       sections.recentManga.length > 0;
   
   return (
     <div className="min-h-screen relative overflow-x-hidden">
@@ -141,8 +147,45 @@ const IndexRefactored = memo(() => {
           {/* News and Updates */}
           <NewsAndUpdates className="bg-gradient-to-b from-background/80 to-background" />
           
-          {/* Stats Section (Legacy) */}
-          <StatsSection />
+          {/* Empty State Message */}
+          {!hasAnyContent && (
+            <section className="py-16">
+              <div className="container mx-auto mobile-safe-padding text-center">
+                <div className="glass-card p-12 space-y-6">
+                  <div className="w-20 h-20 mx-auto bg-muted/20 rounded-full flex items-center justify-center">
+                    <svg className="w-10 h-10 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-semibold mb-2">No Content Available Yet</h3>
+                    <p className="text-muted-foreground max-w-md mx-auto">
+                      We're working on populating the database with amazing anime and manga content. 
+                      Check back soon for trending titles, recommendations, and more!
+                    </p>
+                  </div>
+                  <div className="flex gap-4 justify-center">
+                    <Button 
+                      onClick={() => window.location.reload()} 
+                      className="px-6"
+                    >
+                      Refresh Page
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate('/search')}
+                      className="px-6"
+                    >
+                      Search Content
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+          
+          {/* Stats Section (Legacy) - only show if we have content */}
+          {hasAnyContent && <StatsSection />}
         </>
       )}
       

@@ -76,7 +76,7 @@ export default function SearchDemo() {
   }, [handleSearch]);
 
   const handleResultClick = useCallback((result: any) => {
-    console.log('Result clicked:', result);
+    // Navigate to result detail page
     // In a real app, this would navigate to the detail page
   }, []);
 
@@ -225,7 +225,7 @@ export default function SearchDemo() {
                 </div>
                 <div className="flex gap-4 items-center">
                   <VoiceSearch
-                    onStart={() => console.log('Voice search started')}
+                    onStart={() => {/* Voice search started */}}
                     onResult={handleVoiceResult}
                     onError={(error) => console.error('Voice search error:', error)}
                     variant="floating"

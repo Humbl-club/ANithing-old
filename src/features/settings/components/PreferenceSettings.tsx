@@ -1,10 +1,13 @@
+import { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useSettingsStore } from "@/store/settingsStore";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Palette, 
   Globe, 
@@ -21,7 +24,13 @@ import {
   Filter,
   Grid3X3,
   List,
-  Table
+  Table,
+  Volume2,
+  VolumeX,
+  Wifi,
+  WifiOff,
+  Image,
+  ImageOff
 } from "lucide-react";
 
 const LANGUAGE_OPTIONS = [
@@ -54,9 +63,54 @@ const VIEW_OPTIONS = [
 
 const ITEMS_PER_PAGE_OPTIONS = [12, 24, 48, 96];
 
+const ACCESSIBILITY_FEATURES = [
+  { key: 'compact_mode', label: 'Compact Mode', description: 'Reduce spacing and padding', icon: Layout },
+  { key: 'glassmorphism', label: 'Glass Effects', description: 'Enable glassmorphism UI effects', icon: Sparkles },
+  { key: 'animations', label: 'Animations', description: 'Enable UI animations and transitions', icon: Zap },
+  { key: 'auto_play_trailers', label: 'Auto-play Trailers', description: 'Automatically play video trailers', icon: Zap },
+  { key: 'show_spoilers', label: 'Show Spoilers', description: 'Display spoiler content by default', icon: Eye },
+  { key: 'data_saver', label: 'Data Saver', description: 'Reduce data usage and image quality', icon: Database },
+];
+
 export const PreferenceSettings = () => {
   const { settings, updatePreferences } = useSettingsStore();
   const { preferences } = settings;
+  const { toast } = useToast();
+
+  // Apply theme changes immediately
+  useEffect(() => {
+    const applyTheme = () => {
+      const theme = preferences.theme;
+      const effectiveTheme = theme === 'system' 
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : theme;
+      
+      document.documentElement.classList.remove('light', 'dark');
+      document.documentElement.classList.add(effectiveTheme);
+      
+      // Apply other preferences
+      document.documentElement.style.setProperty('--glassmorphism-enabled', preferences.glassmorphism ? '1' : '0');
+      document.documentElement.style.setProperty('--animations-enabled', preferences.animations ? '1' : '0');
+      
+      if (preferences.compact_mode) {
+        document.documentElement.classList.add('compact-mode');
+      } else {
+        document.documentElement.classList.remove('compact-mode');
+      }
+      
+      if (preferences.data_saver) {
+        document.documentElement.classList.add('data-saver');
+      } else {
+        document.documentElement.classList.remove('data-saver');
+      }
+    };
+
+    applyTheme();
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', applyTheme);
+    return () => mediaQuery.removeEventListener('change', applyTheme);
+  }, [preferences.theme, preferences.glassmorphism, preferences.animations, preferences.compact_mode, preferences.data_saver]);
 
   return (
     <div className="space-y-6">
