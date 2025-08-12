@@ -9,7 +9,8 @@ import {
   ChevronRight, 
   Filter,
   Grid3X3,
-  List
+  List,
+  RefreshCw
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { dataService } from '@/core/services/DataService';
@@ -39,15 +40,16 @@ const TrendingTabs = memo(({ onItemClick }: TrendingTabsProps) => {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
   // Fetch trending content for different time ranges
-  const { data: trendingData, isLoading } = useQuery({
+  const { data: trendingData, isLoading, error, refetch } = useQuery({
     queryKey: ['trending-content', contentType],
     queryFn: async (): Promise<TrendingData> => {
-      const sections = await dataService.getHomeSections();
-      
-      // For demo purposes, we'll simulate different time ranges
-      // In a real app, these would be separate API calls with different parameters
-      const baseAnime = sections.trendingAnime;
-      const baseManga = sections.trendingManga;
+      try {
+        const sections = await dataService.getHomeSections();
+        
+        // For demo purposes, we'll simulate different time ranges
+        // In a real app, these would be separate API calls with different parameters
+        const baseAnime = sections.trendingAnime;
+        const baseManga = sections.trendingManga;
       
       let allContent: DomainTitle[] = [];
       
@@ -71,6 +73,10 @@ const TrendingTabs = memo(({ onItemClick }: TrendingTabsProps) => {
         week: shuffled.slice(12, 36),
         month: shuffled.slice(6, 30)
       };
+      } catch (error) {
+        console.error('Error fetching trending content:', error);
+        throw error;
+      }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -120,6 +126,10 @@ const TrendingTabs = memo(({ onItemClick }: TrendingTabsProps) => {
 
   if (isLoading) {
     return <TrendingTabsSkeleton />;
+  }
+
+  if (error) {
+    return <TrendingTabsError error={error} onRetry={refetch} />;
   }
 
   return (
@@ -373,6 +383,38 @@ const TrendingTabsSkeleton = () => (
         {Array.from({ length: 18 }).map((_, i) => (
           <div key={i} className="h-[400px] bg-muted/20 rounded-lg animate-pulse" />
         ))}
+      </div>
+    </div>
+  </section>
+);
+
+const TrendingTabsError = ({ error, onRetry }: { error: Error; onRetry: () => void }) => (
+  <section className="py-16">
+    <div className="container mx-auto mobile-safe-padding">
+      <div className="glass-card p-8 text-center space-y-6">
+        <div className="w-16 h-16 mx-auto bg-red-500/10 rounded-full flex items-center justify-center">
+          <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <div>
+          <h3 className="text-xl font-semibold mb-2">Failed to Load Trending Content</h3>
+          <p className="text-muted-foreground mb-4">
+            There was an error loading the trending content. Please try again.
+          </p>
+          <div className="text-sm text-muted-foreground/70 font-mono bg-muted/10 p-2 rounded">
+            {error.message}
+          </div>
+        </div>
+        <div className="flex gap-3 justify-center">
+          <Button onClick={onRetry} variant="outline" className="gap-2">
+            <RefreshCw className="w-4 h-4" />
+            Try Again
+          </Button>
+          <Button variant="ghost" onClick={() => window.location.reload()}>
+            Refresh Page
+          </Button>
+        </div>
       </div>
     </div>
   </section>

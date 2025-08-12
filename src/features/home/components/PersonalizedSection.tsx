@@ -48,7 +48,7 @@ const PersonalizedSection = memo(({ onItemClick }: PersonalizedSectionProps) => 
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Fetch personalized data for logged-in users
-  const { data: personalizedData, isLoading, refetch } = useQuery({
+  const { data: personalizedData, isLoading, error, refetch } = useQuery({
     queryKey: ['personalized-content', user?.id, refreshKey],
     queryFn: async (): Promise<PersonalizedData> => {
       if (!user) throw new Error('User not authenticated');
@@ -116,6 +116,10 @@ const PersonalizedSection = memo(({ onItemClick }: PersonalizedSectionProps) => 
 
   if (isLoading || !personalizedData) {
     return <PersonalizedSectionSkeleton />;
+  }
+
+  if (error) {
+    return <PersonalizedSectionError error={error} onRetry={refetch} />;
   }
 
   return (
@@ -415,6 +419,38 @@ const PersonalizedSectionSkeleton = () => (
           </div>
         </div>
       ))}
+    </div>
+  </section>
+);
+
+const PersonalizedSectionError = ({ error, onRetry }: { error: Error; onRetry: () => void }) => (
+  <section className="py-16">
+    <div className="container mx-auto mobile-safe-padding">
+      <div className="glass-card p-8 text-center space-y-6">
+        <div className="w-16 h-16 mx-auto bg-red-500/10 rounded-full flex items-center justify-center">
+          <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <div>
+          <h3 className="text-xl font-semibold mb-2">Failed to Load Personalized Content</h3>
+          <p className="text-muted-foreground mb-4">
+            We couldn't load your personalized recommendations. Please try again.
+          </p>
+          <div className="text-sm text-muted-foreground/70 font-mono bg-muted/10 p-2 rounded">
+            {error.message}
+          </div>
+        </div>
+        <div className="flex gap-3 justify-center">
+          <Button onClick={onRetry} variant="outline" className="gap-2">
+            <RefreshCw className="w-4 h-4" />
+            Try Again
+          </Button>
+          <Button variant="ghost" onClick={() => window.location.reload()}>
+            Refresh Page
+          </Button>
+        </div>
+      </div>
     </div>
   </section>
 );
