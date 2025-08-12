@@ -74,6 +74,9 @@ Deno.serve(async (req) => {
       throw new Error('Content not found')
     }
 
+    // Use the actual UUID from the fetched content for additional queries
+    const actualContentId = content.id
+
     // Fetch additional data in parallel
     const additionalPromises: Promise<any>[] = []
 
@@ -90,7 +93,7 @@ Deno.serve(async (req) => {
           created_at,
           profiles(username, display_name)
         `)
-        .eq('title_id', contentId)
+        .eq('title_id', actualContentId)
         .order('helpful_count', { ascending: false })
         .limit(10)
         .then(result => ({ reviews: result.data || [] }))
@@ -101,7 +104,7 @@ Deno.serve(async (req) => {
       supabase
         .from('user_lists')
         .select('status_id, list_statuses(name)')
-        .eq('title_id', contentId)
+        .eq('title_id', actualContentId)
         .then(result => {
           const stats: Record<string, number> = {}
           result.data?.forEach(item => {
@@ -125,7 +128,7 @@ Deno.serve(async (req) => {
             .select('*, title_genres!inner(genre_id)')
             .eq('content_type', contentType)
             .in('title_genres.genre_id', genres)
-            .neq('id', contentId)
+            .neq('id', actualContentId)
             .order('score', { ascending: false })
             .limit(10)
             .then(result => ({ recommendations: result.data || [] }))
@@ -149,7 +152,7 @@ Deno.serve(async (req) => {
             actor_image_url
           )
         `)
-        .eq('title_id', contentId)
+        .eq('title_id', actualContentId)
         .order('character_role')
         .limit(20)
         .then(result => ({ characters: result.data || [] }))
