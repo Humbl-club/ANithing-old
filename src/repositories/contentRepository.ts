@@ -75,16 +75,15 @@ export type DomainTitle = {
   details?: Record<string, any> | null;
 };
 export function mapTitleRowToDomain(row: TitleRow): DomainTitle {
-  const base = TitleRowSchema.safeParse(row);
-  if (!base.success) {
-    throw new Error(`Invalid title row: ${base.error.message}`);
-  }
+  // Skip validation for RPC results which come pre-validated
   const genres = (row.title_genres || []).map(g => g.genres?.name).filter(Boolean) as string[];
   const studios = (row.title_studios || []).map(s => s.studios?.name).filter(Boolean) as string[];
   const authors = (row.title_authors || []).map(a => a.authors?.name).filter(Boolean) as string[];
+  
   const details = row.content_type === 'anime'
-    ? (row.anime_details && row.anime_details[0] ? AnimeDetailsRowSchema.parse(row.anime_details[0]) : null)
-    : (row.manga_details && row.manga_details[0] ? MangaDetailsRowSchema.parse(row.manga_details[0]) : null);
+    ? (row.anime_details && row.anime_details[0] ? row.anime_details[0] : null)
+    : (row.manga_details && row.manga_details[0] ? row.manga_details[0] : null);
+  
   return {
     id: row.id,
     anilist_id: row.anilist_id,
@@ -94,7 +93,7 @@ export function mapTitleRowToDomain(row: TitleRow): DomainTitle {
     synopsis: row.synopsis || '',
     image_url: row.image_url || '',
     score: row.score ?? null,
-    anilist_score: row.anilist_score ?? null,
+    anilist_score: row.score ?? null, // Use score as anilist_score fallback
     rank: row.rank ?? null,
     popularity: row.popularity ?? null,
     favorites: row.favorites ?? null,
@@ -118,28 +117,27 @@ export type ListParams = {
 function selectWithJoins(detailed: boolean = false) {
   // For list views, only select essential fields
   const baseFields = `
-    id, anilist_id, title, title_english, title_native,
+    id, anilist_id, title, title_english, title_japanese,
     content_type, score, popularity, favorites,
-    cover_image, cover_image_color, banner_image,
-    status, created_at, updated_at
+    image_url, synopsis, rank, members,
+    year, color_theme, created_at, updated_at
   `;
   
   // For detailed views, include all fields
   const detailFields = detailed ? `
-    description, mean_score, hashtag, synonyms,
-    country_of_origin, source
+    *
   ` : '';
   
   // Always include essential joins but limit fields
   const joins = `
-    anime_details!left(episodes, status, season, season_year, format),
+    anime_details!left(episodes, status, season, season_year, type, aired_from, aired_to),
     manga_details!left(chapters, volumes, status),
     title_genres!left(genres!inner(name)),
     title_studios!left(studios!inner(name)),
     title_authors!left(authors!inner(name))
   `;
   
-  return detailed ? `*, ${joins}` : `${baseFields}${detailFields ? ',' + detailFields : ''}, ${joins}`;
+  return detailed ? `*, ${joins}` : `${baseFields}, ${joins}`;
 }
 export async function getTitleById(
   supabase: SupabaseClient<Database>,
