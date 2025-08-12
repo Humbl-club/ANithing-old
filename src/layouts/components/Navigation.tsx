@@ -2,7 +2,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
   Search, 
@@ -134,6 +133,9 @@ export function Navigation() {
         e.preventDefault();
         setQuickSearchOpen(true);
         setTimeout(() => searchRef.current?.focus(), 100);
+      }
+      if (e.key === 'Escape') {
+        setQuickSearchOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
