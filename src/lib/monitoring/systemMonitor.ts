@@ -96,7 +96,7 @@ class SystemMonitor {
       this.collectMetrics();
     }, intervalMs);
 
-    console.log('📊 System monitoring started');
+    // System monitoring started
     addBreadcrumb('System monitoring started', 'monitor', 'info');
   }
 
@@ -109,7 +109,7 @@ class SystemMonitor {
       this.monitoringInterval = null;
     }
     this.isMonitoring = false;
-    console.log('📊 System monitoring stopped');
+    // System monitoring stopped
   }
 
   /**

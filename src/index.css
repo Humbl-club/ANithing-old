@@ -1,5 +1,6 @@
 /* Import ANITHING Animations */
 @import './styles/animations.css';
+@import './styles/settings-effects.css';
 
 @tailwind base;
 @tailwind components;
@@ -347,6 +348,75 @@
       0 0 40px hsl(var(--primary) / 0.2);
     transform: translateY(-2px);
     border-color: hsl(var(--primary) / 0.3);
+  }
+
+  /* Apple Glass Reflection Effects */
+  .glass-reflection {
+    position: relative;
+  }
+
+  .glass-reflection::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .glass-reflection::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 1rem;
+    right: 1rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* Enhanced Card Hover States */
+  .card-hover-lift {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-hover-lift:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.3),
+      0 0 40px hsl(var(--primary) / 0.2);
+  }
+
+  /* Premium Glass Button */
+  .glass-button-premium {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass-button-premium::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .glass-button-premium:hover::before {
+    opacity: 1;
+  }
+
+  .glass-button-premium::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0.5rem;
+    right: 0.5rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
   }
 
   .glass-search {
